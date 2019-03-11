@@ -1,4 +1,4 @@
-# Dockerizé un serveur web simple
+# Dockerizez un serveur web simple
 
 ## Enoncé
 
