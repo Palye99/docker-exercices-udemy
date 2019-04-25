@@ -25,30 +25,30 @@ Afin de définir notre stack ELK, créez un répertoire *elk* et, à l'intérieu
 version: '3.3'
 services:
   logstash:
-    image: logstash:5.5.2
+    image: logstash:6.7.1
     volumes:
       - ./logstash.conf:/config/logstash.conf
     command: ["logstash", "-f", "/config/logstash.conf"]
     ports:
       - 8080:8080
   elasticsearch:
-    image: elasticsearch:5.5.2
+    image: elasticsearch:6.7.1
     environment:
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
   kibana:
-    image: kibana:5.5.2
+    image: kibana:6.7.1
     ports:
       - 5601:5601
 ```
 
 Note:
 
-Le service Logstash est basé sur l'image officielle logstash:5.5.2.
+Le service Logstash est basé sur l'image officielle logstash:6.7.1.
 Nous précisons sous la clé volumes le fichier de configuration logstash.conf présent dans le répertoire est monté sur /config/logstash.conf dans le container afin d'être pris en compte au démarrage
 
-Le service Elasticseach est basé sur l'image officielle elasticsearch:5.5.2. La variable d'environnement ES_JAVA_OPTS est spécifiée dans le service elasticsearch afin de limiter la consommation en resource
+Le service Elasticseach est basé sur l'image officielle elasticsearch:6.7.1. La variable d'environnement ES_JAVA_OPTS est spécifiée dans le service elasticsearch afin de limiter la consommation en resource
 
-Le service Kibana est basé sur l'image officielle kibana:5.5.2. Le mapping de port permettra à l'interface web d'être disponible sur le port 5601 de la machine hôte.
+Le service Kibana est basé sur l'image officielle kibana:6.7.1. Le mapping de port permettra à l'interface web d'être disponible sur le port 5601 de la machine hôte.
 
 ## Fichier de configuration de Logstash
 
@@ -109,8 +109,8 @@ Lancez la stack ELK avec la commande suivante
 ```
 $ docker-compose up -d
 Creating network "elk_default" with the default driver
-Pulling elasticsearch (elasticsearch:5.5.2)...
-5.5.2: Pulling from library/elasticsearch
+Pulling elasticsearch (elasticsearch:6.7.1)...
+6.7.1: Pulling from library/elasticsearch
 219d2e45b4af: Pull complete
 a482fbcfe407: Pull complete
 980edaaff53b: Pull complete
@@ -127,9 +127,9 @@ f822bfcfdea9: Pull complete
 47b728c174e9: Pull complete
 9a2de73c3385: Pull complete
 Digest: sha256:3686a5757ed46c9dbcf00f6f71fce48ffc5413b193a80d1c46a21e7aad4c53ad
-Status: Downloaded newer image for elasticsearch:5.5.2
-Pulling logstash (logstash:5.5.2)...
-5.5.2: Pulling from library/logstash
+Status: Downloaded newer image for elasticsearch:6.7.1
+Pulling logstash (logstash:6.7.1)...
+6.7.1: Pulling from library/logstash
 219d2e45b4af: Already exists
 a482fbcfe407: Already exists
 980edaaff53b: Already exists
@@ -147,9 +147,9 @@ b8d29bf120da: Pull complete
 998889940a16: Pull complete
 0cf6dea86193: Pull complete
 Digest: sha256:6d5236d5a2371af15d19300f80be7e742e4fa15a19335c6a1372e685e803bc70
-Status: Downloaded newer image for logstash:5.5.2
-Pulling kibana (kibana:5.5.2)...
-5.5.2: Pulling from library/kibana
+Status: Downloaded newer image for logstash:6.7.1
+Pulling kibana (kibana:6.7.1)...
+6.7.1: Pulling from library/kibana
 aa18ad1a0d33: Pull complete
 fa2d2a20bb84: Pull complete
 667931c73e5d: Pull complete
@@ -160,7 +160,7 @@ c28d9cc6e097: Pull complete
 9abde8e46c89: Pull complete
 9d6f193cf5a9: Pull complete
 Digest: sha256:a121bbf35425bb7d3448feae3211cdbfdfa128f0f7301bdb5dc82a0a91edb885
-Status: Downloaded newer image for kibana:5.5.2
+Status: Downloaded newer image for kibana:6.7.1
 Creating elk_elasticsearch_1 ...
 Creating elk_elasticsearch_1 ... done
 Creating elk_kibana_1 ...
