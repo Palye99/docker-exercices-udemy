@@ -265,8 +265,8 @@ $ docker service create --name whoami \
 --replicas 2 \
 --update-failure-action rollback \
 --update-delay 10s \
-—-update-monitor 10s \
-—-publish 8000:8000 \
+--update-monitor 10s \
+--publish 8000:8000 \
 lucj/whoami:1.0
 ```
 
@@ -282,9 +282,12 @@ Une fois que le service est créé, vérifier qu'il fonctionne correctement en e
 
 ```
 $ curl http://IP:8000/whoami
-6fb7de6faae1                                                                             $ curl http://IP:8000/whoami
-86035acd13fa                                                                             $ curl http://IP:8000/whoami
-6fb7de6faae1%                                                                            $ curl http://IP:8000/whoami
+6fb7de6faae1                                                                             
+$ curl http://IP:8000/whoami
+86035acd13fa                                                                             
+$ curl http://IP:8000/whoami
+6fb7de6faae1%                                                                            
+$ curl http://IP:8000/whoami
 86035acd13fa
 ```
 

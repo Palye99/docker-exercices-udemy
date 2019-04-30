@@ -112,6 +112,68 @@ Vous pouvez ensuite lancer la stack avec la commande suivante
 
 ```
 $ docker-compose up -d
+<<<<<<< HEAD
+=======
+Creating network "elk_default" with the default driver
+Pulling elasticsearch (elasticsearch:6.7.1)...
+6.7.1: Pulling from library/elasticsearch
+219d2e45b4af: Pull complete
+a482fbcfe407: Pull complete
+980edaaff53b: Pull complete
+288ffe538f2f: Pull complete
+017932737cd4: Pull complete
+28b38dddf546: Pull complete
+92aff82bd83f: Pull complete
+b08144fb654d: Pull complete
+14ed224fb73f: Pull complete
+f478c95dec23: Pull complete
+5f9ae4a86d71: Pull complete
+f822bfcfdea9: Pull complete
+98d9d4b54ad0: Pull complete
+47b728c174e9: Pull complete
+9a2de73c3385: Pull complete
+Digest: sha256:3686a5757ed46c9dbcf00f6f71fce48ffc5413b193a80d1c46a21e7aad4c53ad
+Status: Downloaded newer image for elasticsearch:6.7.1
+Pulling logstash (logstash:6.7.1)...
+6.7.1: Pulling from library/logstash
+219d2e45b4af: Already exists
+a482fbcfe407: Already exists
+980edaaff53b: Already exists
+288ffe538f2f: Already exists
+017932737cd4: Already exists
+28b38dddf546: Already exists
+92aff82bd83f: Already exists
+b08144fb654d: Already exists
+b8d29bf120da: Pull complete
+49e4e007d02f: Pull complete
+9e166f659798: Pull complete
+1cab00742484: Pull complete
+6f3222fb2dff: Pull complete
+0324209cde1f: Pull complete
+998889940a16: Pull complete
+0cf6dea86193: Pull complete
+Digest: sha256:6d5236d5a2371af15d19300f80be7e742e4fa15a19335c6a1372e685e803bc70
+Status: Downloaded newer image for logstash:6.7.1
+Pulling kibana (kibana:6.7.1)...
+6.7.1: Pulling from library/kibana
+aa18ad1a0d33: Pull complete
+fa2d2a20bb84: Pull complete
+667931c73e5d: Pull complete
+7e8919cd44f8: Pull complete
+e5d237d4fd33: Pull complete
+c28d9cc6e097: Pull complete
+47cc615b83bf: Pull complete
+9abde8e46c89: Pull complete
+9d6f193cf5a9: Pull complete
+Digest: sha256:a121bbf35425bb7d3448feae3211cdbfdfa128f0f7301bdb5dc82a0a91edb885
+Status: Downloaded newer image for kibana:6.7.1
+Creating elk_elasticsearch_1 ...
+Creating elk_elasticsearch_1 ... done
+Creating elk_kibana_1 ...
+Creating elk_logstash_1 ...
+Creating elk_kibana_1
+Creating elk_logstash_1 ... done
+>>>>>>> 86db1f2c9249cb75db8f52e1f35fe5909e099ea7
 ```
 
 Une fois les images téléchargées (depuis le Docker Hub), le lancement de l'application peut prendre quelques secondes.
