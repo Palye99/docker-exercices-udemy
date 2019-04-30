@@ -195,8 +195,7 @@ $ cat /tmp/data
 Nous allons à présent utiliser un script bash pour envoyer ces données au service *telegraf*. Créez le fichier *send.sh* avec le contenu suivant (remplacez *IP* par l'adresse IP de l'une des machine de votre Swarm):
 
 ```
-PORT=8186
-endpoint="http://IP:$PORT/write"
+endpoint="http://<IP>:8186/write"
 cat /tmp/data | while read line; do
   ts="$(echo $line | cut -d' ' -f1)000000000"
   value=$(echo $line | cut -d' ' -f2)

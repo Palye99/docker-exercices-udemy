@@ -175,4 +175,4 @@ Successfully built 466e5916fe4f
 Successfully tagged pong:1.3
 ```
 
-Nous observons ici que le cache est utilisé jusqu'au step 3 (---> Using cache). Il est ensuite invalidé lors du step 4 car le daemon Docker a détecter le changement de code que nous avons effectué. La prise en compte du cache permet souvent de gagner beaucoup de temps lors de la phase d build.
+Nous observons ici que le cache est utilisé jusqu'au step 3 (---> Using cache). Il est ensuite invalidé lors du step 4 car le daemon Docker a détecté le changement de code que nous avons effectué. La prise en compte du cache permet souvent de gagner beaucoup de temps lors de la phase de build.

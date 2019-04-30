@@ -22,33 +22,31 @@ Note: nous considérerons que les fichiers de log sont générés par un serveur
 Afin de définir notre stack ELK, créez un répertoire *elk* et, à l'intérieur de celui-ci, le fichier docker-compose.yml avec le contenu suivant:
 
 ```
-version: '3.3'
+version: '3.6'
 services:
   logstash:
-    image: logstash:5.5.2
+    image: logstash:6.7.1
     volumes:
       - ./logstash.conf:/config/logstash.conf
     command: ["logstash", "-f", "/config/logstash.conf"]
     ports:
       - 8080:8080
   elasticsearch:
-    image: elasticsearch:5.5.2
-    environment:
-      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    image: elasticsearch:6.7.1
   kibana:
-    image: kibana:5.5.2
+    image: kibana:6.7.1
     ports:
       - 5601:5601
 ```
 
 Note:
 
-Le service Logstash est basé sur l'image officielle logstash:5.5.2.
+Le service Logstash est basé sur l'image officielle logstash:6.7.1.
 Nous précisons sous la clé volumes le fichier de configuration logstash.conf présent dans le répertoire est monté sur /config/logstash.conf dans le container afin d'être pris en compte au démarrage
 
-Le service Elasticseach est basé sur l'image officielle elasticsearch:5.5.2. La variable d'environnement ES_JAVA_OPTS est spécifiée dans le service elasticsearch afin de limiter la consommation en resource
+Le service Elasticseach est basé sur l'image officielle elasticsearch:6.7.1. La variable d'environnement ES_JAVA_OPTS est spécifiée dans le service elasticsearch afin de limiter la consommation en resource
 
-Le service Kibana est basé sur l'image officielle kibana:5.5.2. Le mapping de port permettra à l'interface web d'être disponible sur le port 5601 de la machine hôte.
+Le service Kibana est basé sur l'image officielle kibana:6.7.1. Le mapping de port permettra à l'interface web d'être disponible sur le port 5601 de la machine hôte.
 
 ## Fichier de configuration de Logstash
 
@@ -104,69 +102,16 @@ Ce fichier peu sembler un peu compliqué. Il peut être découpé en 3 parties:
 
 ## Lancement de la stack ELK
 
-Lancez la stack ELK avec la commande suivante
+Pre-réquis: avant de lancer la stack ELK, il est nécessaire de modifier un paramètre du noyau Linux pour assurer le bon fonctionnement de Elasticsearch, pour cela lancer la commande suivante:
+
+```
+$ sudo sysctl -w vm.max_map_count=262144
+```
+
+Vous pouvez ensuite lancer la stack avec la commande suivante
 
 ```
 $ docker-compose up -d
-Creating network "elk_default" with the default driver
-Pulling elasticsearch (elasticsearch:5.5.2)...
-5.5.2: Pulling from library/elasticsearch
-219d2e45b4af: Pull complete
-a482fbcfe407: Pull complete
-980edaaff53b: Pull complete
-288ffe538f2f: Pull complete
-017932737cd4: Pull complete
-28b38dddf546: Pull complete
-92aff82bd83f: Pull complete
-b08144fb654d: Pull complete
-14ed224fb73f: Pull complete
-f478c95dec23: Pull complete
-5f9ae4a86d71: Pull complete
-f822bfcfdea9: Pull complete
-98d9d4b54ad0: Pull complete
-47b728c174e9: Pull complete
-9a2de73c3385: Pull complete
-Digest: sha256:3686a5757ed46c9dbcf00f6f71fce48ffc5413b193a80d1c46a21e7aad4c53ad
-Status: Downloaded newer image for elasticsearch:5.5.2
-Pulling logstash (logstash:5.5.2)...
-5.5.2: Pulling from library/logstash
-219d2e45b4af: Already exists
-a482fbcfe407: Already exists
-980edaaff53b: Already exists
-288ffe538f2f: Already exists
-017932737cd4: Already exists
-28b38dddf546: Already exists
-92aff82bd83f: Already exists
-b08144fb654d: Already exists
-b8d29bf120da: Pull complete
-49e4e007d02f: Pull complete
-9e166f659798: Pull complete
-1cab00742484: Pull complete
-6f3222fb2dff: Pull complete
-0324209cde1f: Pull complete
-998889940a16: Pull complete
-0cf6dea86193: Pull complete
-Digest: sha256:6d5236d5a2371af15d19300f80be7e742e4fa15a19335c6a1372e685e803bc70
-Status: Downloaded newer image for logstash:5.5.2
-Pulling kibana (kibana:5.5.2)...
-5.5.2: Pulling from library/kibana
-aa18ad1a0d33: Pull complete
-fa2d2a20bb84: Pull complete
-667931c73e5d: Pull complete
-7e8919cd44f8: Pull complete
-e5d237d4fd33: Pull complete
-c28d9cc6e097: Pull complete
-47cc615b83bf: Pull complete
-9abde8e46c89: Pull complete
-9d6f193cf5a9: Pull complete
-Digest: sha256:a121bbf35425bb7d3448feae3211cdbfdfa128f0f7301bdb5dc82a0a91edb885
-Status: Downloaded newer image for kibana:5.5.2
-Creating elk_elasticsearch_1 ...
-Creating elk_elasticsearch_1 ... done
-Creating elk_kibana_1 ...
-Creating elk_logstash_1 ...
-Creating elk_kibana_1
-Creating elk_logstash_1 ... done
 ```
 
 Une fois les images téléchargées (depuis le Docker Hub), le lancement de l'application peut prendre quelques secondes.
@@ -175,7 +120,7 @@ L'interface web de Kibana est alors accessible sur le port 5601 de la machine h�
 
 ![ELK](./images/elk1.png)
 
-Nous obtenons un message d'erreur car il n'y a pas encore de données dans Elasticsearch, Kibana n'est pas en mesure de détecter un index.
+Il n'y a pas encore de données dans Elasticsearch, Kibana n'est pas en mesure de détecter un index.
 
 ## Utilisation d'un fichier de logs de test
 
@@ -201,24 +146,25 @@ Ce fichier contient 500 entrées de logs au format Apache. Par exemple, la ligne
 On utilise alors la commande suivante pour envoyer chaque ligne à Logstash:
 
 ```
-while read -r line; do curl -s -XPUT -d "$line" http://localhost:8080 > /dev/null; done < ./nginx.log
+while read -r line; do curl -s -XPUT -d "$line" http://localhost:8080; done < ./nginx.log
 ```
 
-Une fois le script terminé, rafraichissez l'interface de Kibana, nous devriez voir que le message d'erreur précédent n'apparait plus car il y a maitenant des logs qui ont été indéxés par Elasticsearch et qui sont visibles par Kibana.
+Une fois le script terminé, allez dans le menu *discover* il vous sera demandé de créer un index. Ceci est maintenant possible car des entrées de logs ont été indéxées par Elasticsearch.
 
 ![ELK](./images/elk2.png)
-
-Cliquez sur Create afin de créer un pattern permettant d'identifier l'index que Elasticsearch a créé lors du traitement des entrées de logs. Cliquez ensuite sur Discover dans le menu de droite. Assurez vous d'avoir une période de recherche assez large afin de couvrir la date de l'entrée que nous avons spécifiée, vous pouvez configurer cette période en haut à droite de l'interface.
-
 ![ELK](./images/elk3.png)
 
-A partir de ces données, nous pouvons par exemple créer une visualisation permettant de lister les pays d'ou proviennent ces requêtes.
+Assurez vous d'avoir une période de recherche assez large afin de couvrir la date de l'entrée que nous avons spécifiée, vous pouvez configurer cette période en haut à droite de l'interface.
 
 ![ELK](./images/elk4.png)
 
-En allant un peu plus loin, nous pouvons, pour chaque pays, faire un découpage supplémentaire sur le code retour de la requête.
+A partir de ces données, nous pouvons par exemple créer une visualisation permettant de lister les pays d'ou proviennent ces requêtes.
 
 ![ELK](./images/elk5.png)
+
+En allant un peu plus loin, nous pouvons, pour chaque pays, faire un découpage supplémentaire sur le code retour de la requête.
+
+![ELK](./images/elk6.png)
 
 Nous pourrions ensuite, grace aux filtres, voir de quels pays proviennent les requêtes dont le code de retour est 401 (Unauthorized).
 

@@ -29,7 +29,7 @@ Status: Downloaded newer image for alpine:latest
 hello
 ```
 
-L'image alpine n'étant pas disponible localement, elle est téléchargée depuis le Docker Hub. Un container est alors lancé à partir de cette image avec la commande spécifiée (echo "hello"). Le résultat de cette commande est affiché sur la sortie standard. Une fois la commande terminée, le container est supprimé.
+L'image alpine n'étant pas disponible localement, elle est téléchargée depuis le Docker Hub. Un container est alors lancé à partir de cette image avec la commande spécifiée (echo "hello"). Le résultat de cette commande est affiché sur la sortie standard. Une fois la commande terminée, le container est stoppé mais il existe toujours.
 
 3. La commande à lancer est "docker container run alpine"
 

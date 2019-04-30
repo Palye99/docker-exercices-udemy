@@ -12,11 +12,11 @@ Qu'observez-vous ?
 
 4. Quittez le container avec CTRL-P CTRL-Q (pour ne pas killer le processus de PID 1)
 
-5. Créez une image, nommée *myping*, à partir du container *c1*
+5. Créez une image, nommée *curly*, à partir du container *c1*
 
 Utilisez pour cela la commande *commit* (*docker commit --help* pour voir le fonctionnment de cette commande)
 
-6. Lancez un shell intéractif dans un container basée sur l’image *myping* et vérifiez que *curl* est présent
+6. Lancez un shell intéractif dans un container basée sur l’image *curly* et vérifiez que *curl* est présent
 
 
 ## Correction
@@ -57,18 +57,18 @@ Executing ca-certificates-20171114-r3.trigger
 OK: 6 MiB in 18 packages
 ```
 
-5. Afin de créer l'image *myping* à partir du container *c1*, il faut utiliser la commande suivante
+5. Afin de créer l'image *curly* à partir du container *c1*, il faut utiliser la commande suivante
 
 ```
-$ docker container commit c1 myping
+$ docker container commit c1 curly
 ```
 
-6. La commande suivante permet de lancer un shell *sh* dans un container basé sur l'image *myping*.
+6. La commande suivante permet de lancer un shell *sh* dans un container basé sur l'image *curly*.
 
-Note: même si l'on ne précise pas la commande *sh*, la commande utilisée par défaut est celle de l'image à partir de laquelle *myping* a été créée, c'est à dire *alpine*. 
+Note: même si l'on ne précise pas la commande *sh*, la commande utilisée par défaut est celle de l'image à partir de laquelle *curly* a été créée, c'est à dire *alpine*. 
 
 ```
-$ docker container run -ti myping
+$ docker container run -ti curly
 ```
 
 Depuis ce shell, nous pouvons relancer la commande de la question 2.

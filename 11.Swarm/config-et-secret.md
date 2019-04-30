@@ -41,7 +41,7 @@ $ openssl genrsa -out ca-key.pem 2048
 
 Note: si nous souhaitons associer une passphrase à cette clé, nous pouvons ajouter l'option *-aes256* à la commande *genrsa* (d'autres options d'encryption peuvent également être utilisées).
 
-### Création du certificat associé 
+### Création du certificat associé
 
 Lancez la commande suivante afin de créer un certificat autosigné pour notre CA.
 
@@ -55,7 +55,7 @@ Note: comme nous le verrons par la suite, nous aurons une exception de sécurit�
 
 ## Clé privé / publique pour notre domaine
 
-Nous allons supposer que notre application sera exposée sur le nom de domaine *city.dev*. Assurez-vous de modifier votre fichier */etc/hosts* de façon à ce que ce domaine soit résolu avec l'adresse IP locale *127.0.0.1*.
+Nous allons supposer que notre application sera exposée sur le nom de domaine *city.com*. Assurez-vous de modifier votre fichier */etc/hosts* de façon à ce que ce domaine soit résolu avec l'adresse IP locale *127.0.0.1*.
 
 ### Création de la clé privée
 
@@ -70,7 +70,7 @@ $ openssl genrsa -out server-key.pem 2048
 Lancez la commande suivante afin de créer une demande de signature du certificat du serveur.
 
 ```
-$ openssl req -new -subj "/C=FR/L=Nice/O=MyOrg/CN=city.dev" -key server-key.pem -out server.csr
+$ openssl req -new -subj "/C=FR/L=Nice/O=MyOrg/CN=city.com" -key server-key.pem -out server.csr
 ```
 
 ### Signature du certificat
@@ -114,13 +114,13 @@ http {
 
     server {
         listen                    80;
-        server_name               city.dev;
-        rewrite ^ https://city.dev$request_uri? permanent;
+        server_name               city.com;
+        rewrite ^ https://city.com$request_uri? permanent;
     }
 
     server {
         listen                    443 ssl;
-        server_name               city.dev;
+        server_name               city.com;
         ssl_certificate           /etc/ssl/certs/server.crt;
         ssl_certificate_key       /etc/ssl/certs/server.key;
         ssl_protocols             TLSv1 TLSv1.1 TLSv1.2;
@@ -238,7 +238,7 @@ ID            NAME       MODE        REPLICAS  IMAGE          PORTS
 jngcz7xtwumi  app_proxy  replicated  1/1       nginx:1.12.2   *:80->80/tcp,*:443->443/tcp
 ```
 
-Nous pouvons maintenant ouvrir un navigateur web, aller sur *http://city.dev* et constater un message d'erreur qui nous informe que la connexion n'est pas sécurisée. Cela vient du fait que le CA que nous avons utilisé pour signer le certificat du serveur n'est pas connu par le navigateur.
+Nous pouvons maintenant ouvrir un navigateur web, aller sur *http://city.com* et constater un message d'erreur qui nous informe que la connexion n'est pas sécurisée. Cela vient du fait que le CA que nous avons utilisé pour signer le certificat du serveur n'est pas connu par le navigateur.
 
 Il faudra confirmer une exception de sécurité pour pouvoir passer cette étape.
 
@@ -250,7 +250,7 @@ Le site sera ensuite accessible en https
 
 ## Résumé
 
-Nous avons donc rapidement pu ajouter un service assurant la terminaison TLS à notre application. 
+Nous avons donc rapidement pu ajouter un service assurant la terminaison TLS à notre application.
 
 Un des points intéressants est la façon dont nous avons fournis la configuration, le certificat et la clé privée au reverse-proxy en utilisant les primitives Config et Secret.
 

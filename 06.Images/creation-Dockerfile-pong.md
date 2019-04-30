@@ -1,8 +1,9 @@
-# Dockerizé un serveur web simple
+# Dockerizez un serveur web simple
 
 ## Enoncé
 
-1. Développez un serveur HTTP qui expose le endpoint */ping* sur le port 80 et répond par PONG
+1. Développez (ou prenez l'exemple développeé en Node.js de la correction :) ) un serveur HTTP qui expose le endpoint */ping* sur le port 80 et répond par PONG.
+
 
 2. Créez le fichier Dockerfile qui servira à construire l'image de l'application. Ce fichier devra décrire les actions suivantes
 
@@ -38,7 +39,7 @@ app.get('/ping', function(req, res) {
 app.listen(80);
 ```
 
-Le fichier *package.json* contient les dépenances de l'application (dans le cas présent, il s'agit de la librairie *expressjs* utilisée pour la réalisation d'application web dans le monde NodeJs.
+Le fichier *package.json* contient les dépendances de l'application (dans le cas présent, il s'agit de la librairie *expressjs* utilisée pour la réalisation d'application web dans le monde NodeJs.
 
 ```
 {
