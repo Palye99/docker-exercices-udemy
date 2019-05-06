@@ -33,7 +33,7 @@ L'image alpine n'étant pas disponible localement, elle est téléchargée depui
 
 3. La commande à lancer est "docker container run alpine"
 
-L'image alpine étant déjà présente localement (téléchargée lors de l'étape précédente), elle est ré-utilisée. La commande exécutée par défaut lors du lancement d'un container basé sur alpine est "/bin/sh". Cette commande ne produit pas de résultat sur la sortie standard. Le container est supprimé une fois la commande lancée.
+L'image alpine étant déjà présente localement (téléchargée lors de l'étape précédente), elle est ré-utilisée. La commande exécutée par défaut lors du lancement d'un container basé sur alpine est "/bin/sh". Cette commande ne produit pas de résultat sur la sortie standard. Une fois la commande terminée, le container est stoppé mais il existe toujours.
 
 ---
 
@@ -90,15 +90,15 @@ Le but de cet exercice est de créer des containers en foreground et en backgrou
 
 Le container est t-il toujours en cours d’exécution ?
 
-Note: vous pouvez utiliser la command docker ps  que nous détaillerons dans l'une des prochaines lectures), et qui permet de lister les containers qui tournent sur la machine.
+Note: vous pouvez utiliser la commande docker ps  que nous détaillerons dans l'une des prochaines lectures), et qui permet de lister les containers qui tournent sur la machine.
 
-3. Lancez un container en mode interactif en lui spécifiant la command ```ping 8.8.8.8```
+3. Lancez un container en mode interactif en lui spécifiant la commande ```ping 8.8.8.8```
 
 4. Arrêter le container avec CTRL-P CTRL-Q
 
 Le container est t-il toujours en cours d’exécution ?
 
-5. Lancez un container en background, toujours en lui spécifiant la command ```ping 8.8.8.8```
+5. Lancez un container en background, toujours en lui spécifiant la commande ```ping 8.8.8.8```
 
 Le container est t-il toujours en cours d’exécution ?
 

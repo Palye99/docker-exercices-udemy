@@ -2,7 +2,7 @@
 
 ## Enoncé
 
-1. Développez (ou prenez l'exemple développeé en Node.js de la correction :) ) un serveur HTTP qui expose le endpoint */ping* sur le port 80 et répond par PONG.
+1. Développez (ou prenez l'exemple développé en Node.js de la correction :) ) un serveur HTTP qui expose le endpoint */ping* sur le port 80 et répond par PONG.
 
 
 2. Créez le fichier Dockerfile qui servira à construire l'image de l'application. Ce fichier devra décrire les actions suivantes

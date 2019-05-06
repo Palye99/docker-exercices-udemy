@@ -170,7 +170,7 @@ Supprimez maintenant le container *c2*.
 $ docker container stop c2 && docker container rm c2
 ```
 
-Vérifier que le fichier *hello.txt* existe tojours sur le filesystem de l’hôte.
+Vérifier que le fichier *hello.txt* existe toujours sur le filesystem de l’hôte.
 
 ```
 $ find $VOLUME_PATH -name hello.txt

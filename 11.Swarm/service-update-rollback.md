@@ -265,8 +265,8 @@ $ docker service create --name whoami \
 --replicas 2 \
 --update-failure-action rollback \
 --update-delay 10s \
---update-monitor 10s \
---publish 8000:8000 \
+—-update-monitor 10s \
+—-publish 8000:8000 \
 lucj/whoami:1.0
 ```
 
@@ -282,12 +282,9 @@ Une fois que le service est créé, vérifier qu'il fonctionne correctement en e
 
 ```
 $ curl http://IP:8000/whoami
-6fb7de6faae1                                                                             
-$ curl http://IP:8000/whoami
-86035acd13fa                                                                             
-$ curl http://IP:8000/whoami
-6fb7de6faae1%                                                                            
-$ curl http://IP:8000/whoami
+6fb7de6faae1                                                                             $ curl http://IP:8000/whoami
+86035acd13fa                                                                             $ curl http://IP:8000/whoami
+6fb7de6faae1%                                                                            $ curl http://IP:8000/whoami
 86035acd13fa
 ```
 
@@ -304,11 +301,10 @@ Au bout de quelques secondes, vous devriez observer un rollback automatique déc
 
 ```
 whoami
-overall progress: rolling back update: 2 out of 2 tasks
-1/2: running   [>                                                  ]
-2/2: running   [>                                                  ]
-rollback: update rolled back due to failure or early termination of task blsvru71t1wh1uc50ryujxhif
-verify: Service converged
+overall progress: 0 out of 2 tasks
+1/2: starting  [============================================>      ]
+2/2:
+service rolled back: rollback completed
 ```
 
 Durant cette tentative de mise à jour, la seconde tâche n'a pas été impactée et le service était donc toujours disponible, la première tâche n'étant plus utilisée lors du load balancing. Le service aurait été indisponible si nous n'avions spécifié qu'un seul réplica.
