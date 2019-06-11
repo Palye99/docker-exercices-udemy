@@ -7,44 +7,28 @@ Dans cet exercice, vous allez configurer le deamon Docker de façon à envoyer l
 
 Rendez-vous sur [https://sumologic.com](https://sumologic.com) et suivez la procédure de création de compte. Vous avez la possibilité de créer un compte gratuit, il ne sera pas nécessaire de renseigner un numéro de CB.
 
-![Sumologic signup](./images/sumo-signup-1.png)
+![Sumologic login](./images/sumo-login-1.png)
 
-![Sumologic signup](./images/sumo-signup-2.png)
+![Sumologic login](./images/sumo-login-2.png)
 
 Suite à la création de votre compte, vous recevrez un email, il vous faudra valider la création et renseigner quelques informations supplémentaires.
 
 
 ## Création d'un collector de log
 
-Une fois votre compte crée, vous allez devoir créer un *collector* qui servira à stocker et à manipuler les logs que vous enverrez dans la suite.
+Une fois votre compte crée, vous allez suivre les étapes suivantes afin d'obtenir une URL que vous utiliserez dans la suite pour envoyer les logs.
 
-Cliquez sur *Set Up Streaming Data* pour commencer le process.
+![Sumologic setup](./images/sumo-setup-1.png)
 
-![Sumologic welcome](./images/sumo-welcome.png)
+![Sumologic setup](./images/sumo-setup-2.png)
 
-Dans le menu de gauche, sélectionnez *Manage Data* -> *Collection* et cliquez ensuite sur *Add collector*.
+![Sumologic setup](./images/sumo-setup-3.png)
 
-![Sumologic collection](./images/sumo-collection-1.png)
+![Sumologic setup](./images/sumo-setup-4.png)
 
-Sélectionnez *Hosted Collector*.
+![Sumologic setup](./images/sumo-setup-5.png)
 
-![Sumologic collection](./images/sumo-collection-2.png)
-
-Donnez un nom et une description à votre collector et cliquez sur *Save*.
-
-![Sumologic collection](./images/sumo-collection-3.png)
-
-Une fois le collector créé, cliquez sur *Add source*.
-
-![Sumologic collection](./images/sumo-collection-4.png)
-
-Donnez simplement un nom à cette source et cliquez sur *Save*.
-
-![Sumologic collection](./images/sumo-collection-5.png)
-
-Vous obtiendrez alors une URL que vous devrez noter, vous l'utiliserez dans la suite pour configurer le daemon Docker.
-
-![Sumologic collection](./images/sumo-collection-6.png)
+![Sumologic setup](./images/sumo-setup-6.png)
 
 
 ## Installation du plugin Sumologic
@@ -171,8 +155,9 @@ $ docker run -d chentex/random-logger:latest
 
 Vérifiez ensuite, sur l'interface web de *Sumologic* que les logs sont bien reçus.
 
-![Sumologic collection](./images/sumo-logs.png)
+![Sumologic logs](./images/sumo-logs-1.png)
 
+![Sumologic logs](./images/sumo-logs-2.png)
 
 ## En résumé
 
