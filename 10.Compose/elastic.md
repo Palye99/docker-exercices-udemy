@@ -41,12 +41,10 @@ services:
 
 Note:
 
-Le service Logstash est basé sur l'image officielle logstash:6.7.1.
+- Le service Logstash est basé sur l'image officielle logstash:6.7.1.
 Nous précisons sous la clé volumes le fichier de configuration logstash.conf présent dans le répertoire est monté sur /config/logstash.conf dans le container afin d'être pris en compte au démarrage
 
-Le service Elasticseach est basé sur l'image officielle elasticsearch:6.7.1. La variable d'environnement ES_JAVA_OPTS est spécifiée dans le service elasticsearch afin de limiter la consommation en resource
-
-Le service Kibana est basé sur l'image officielle kibana:6.7.1. Le mapping de port permettra à l'interface web d'être disponible sur le port 5601 de la machine hôte.
+- Le service Kibana est basé sur l'image officielle kibana:6.7.1. Le mapping de port permettra à l'interface web d'être disponible sur le port 5601 de la machine hôte.
 
 ## Fichier de configuration de Logstash
 

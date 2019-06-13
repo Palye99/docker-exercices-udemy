@@ -200,7 +200,7 @@ Par défaut, un container est instantié pour chaque service. Il est possible, a
 Avec la commande suivante, augmenter le nombre de worker à 2.
 
 ```
-$ docker-compose scale worker=2
+$ docker-compose up --scale worker=2
 Starting examplevotingapp_worker_1 ... done
 Creating examplevotingapp_worker_2 ...
 Creating examplevotingapp_worker_2 ... done
@@ -225,20 +225,20 @@ Notes:
 * il n’est pas non plus possible de scaler les services db et redis car ils spécifient tous les 2 l’option container_name, plusieurs containers ne peuvent pas avoir le même nom.
 
 ```
-$ docker-compose scale vote=3
+$ docker-compose up --scale vote=3
 ...
 ERROR: for examplevotingapp_vote_3  Cannot start service vote: driver failed programming external connectivity on endpoint examplevotingapp_vote_3 (b520da97c5736c46bfb2c80947fd2643387df0e0f67bbe18c226bad006dc940e): Bind for 0.0.0.0:5000 failed: port is already allocated
 ```
 
 ```
-docker-compose scale redis=2
+docker-compose up --scale redis=2
 ...
 ERROR: for redis  Cannot create container for service redis: Conflict. The container name "/redis" is already in use by container "ff7ffbbebc3f4441a6b93c9a06389367b552b010bd62377931372ec2da0d4d59". You have to remove (or rename) that container to be able to reuse that name.
 ```
 
 ## Suppression de l’application
 
-Avec la commande suivante, stoppez l’application. Cette commande supprime l’ensemble des éléments créés précédemment (volume et networks).
+Avec la commande suivante, stoppez l’application. Cette commande supprime l’ensemble des éléments créés précédemment sauf les volumles.
 
 ```
 $ docker-compose down
@@ -254,6 +254,12 @@ Removing examplevotingapp_worker_1 ... done
 Removing examplevotingapp_result_1 ... done
 Removing network examplevotingapp_front-tier
 Removing network examplevotingapp_back-tier
+```
+
+Afin de supprimer également les volumes utilisés, il faut ajouter le flag *-v*:
+
+```
+$ docker-compose down -v
 ```
 
 ## Résumé
