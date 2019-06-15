@@ -2,19 +2,9 @@
 
 Dans cette partie, nous allons créer un service simple, le déployer et le scaler (c'est à dire modifier le nombre de containers instanciés pour celui-ci). Nous changerons également la disponibilité d’un node pour voir l’impact sur les tâches en cours.
 
-## Mise en place d'un Swarm
+## Pré-requis
 
-Nous repartons du swarm mis en place précédemment, composé de 3 hôtes Docker créés avec Docker Machine et nommés node1, node2 et node3.
-
-```
-$ docker-machine ls
-NAME    ACTIVE   DRIVER       STATE     URL                         SWARM   DOCKER        ERRORS
-node1   -        virtualbox   Running   tcp://192.168.99.100:2376           v18.09.1
-node2   -        virtualbox   Running   tcp://192.168.99.101:2376           v18.09.1
-node3   -        virtualbox   Running   tcp://192.168.99.102:2376           v18.09.1
-```
-
-Note: n'hésitez pas à partir d'un autre environnement, vous pouvez par exemple créer un Swarm sur [https://play-with-docker.com](https://play-with-docker.com)
+Vous pouvez utiliser un Swarm que vous avez créé lors des exercices précédent, ou bien en créer un nouveau. N'hésitez pas à vous reporter aux cours ou bien aux exercices précédents si vous avez besoin de revoir le process de création.
 
 ## Création d’un service
 
@@ -91,7 +81,7 @@ $ docker service create \
 
 Ce service a la spécification suivante:
 - il est nommé *visualizer*
-- il fait un bind-mount de la socket */var/run/dockrr.sock/* afin de permettre au container du visualizer de dialoguer avec le daemon Docker sur lequel il tourne
+- il fait un bind-mount de la socket */var/run/docker.sock/* afin de permettre au container du visualizer de dialoguer avec le daemon Docker sur lequel il tourne
 - il utilise une contrainte de déploiement pour que le replica du service tourne sur le node qui a le rôle manager
 - il publie le port *8080* sur le port *8000* sur chaque hôte du Swarm
 
@@ -128,4 +118,4 @@ $ docker node update --availability active node2
 
 ## En résumé
 
-Nous avons vu dans cette mise en pratique comment créer des services très simples. Nous avons également vu l'influenc de la propriété *availability* d'un node par rapport à la répartition des tâches des services.
+Nous avons vu dans cette mise en pratique comment créer des services très simples. Nous avons également vu l'influence de la propriété *availability* d'un node par rapport à la répartition des tâches des services.

@@ -265,8 +265,8 @@ $ docker service create --name whoami \
 --replicas 2 \
 --update-failure-action rollback \
 --update-delay 10s \
-—-update-monitor 10s \
-—-publish 8000:8000 \
+--update-monitor 10s \
+--publish 8000:8000 \
 lucj/whoami:1.0
 ```
 
