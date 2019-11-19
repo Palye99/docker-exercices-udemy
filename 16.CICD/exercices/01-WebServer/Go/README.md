@@ -8,5 +8,5 @@ $ go run main.go
 
 ```
 $ curl localhost:8000
-Hey!
+Hi!
 ```

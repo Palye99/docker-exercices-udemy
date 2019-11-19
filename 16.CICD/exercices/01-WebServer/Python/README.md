@@ -4,7 +4,7 @@
 $ pip install -r requirements.txt
 ```
 
-## Lancemnt du serveur
+## Lancement du serveur
 
 ```
 $ python app.py
@@ -14,5 +14,5 @@ $ python app.py
 
 ```
 $ curl localhost:8000
-Hello World!
+Hi!
 ```

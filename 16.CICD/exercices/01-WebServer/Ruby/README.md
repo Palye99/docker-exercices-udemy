@@ -14,5 +14,5 @@ $ ruby app.rb -s Puma
 
 ```
 $ curl localhost:8000
-Hola!
+Hi!
 ```
