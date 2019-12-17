@@ -7,7 +7,7 @@
 
 2. Créez le fichier Dockerfile qui servira à construire l'image de l'application. Ce fichier devra décrire les actions suivantes
 
-- image de base: alpine:3.8
+- image de base: alpine:3.10
 - installation du runtime du langage choisi
 - installation des dépendances de l’application
 - copie du code applicatif
@@ -56,22 +56,22 @@ Le fichier *package.json* contient les dépendances de l'application (dans le ca
 2. Une version du Dockerfile pouvant être utilisé pour créer une image de l'application
 
 ```
-FROM node:10.15-alpine
-COPY . /app/
-RUN cd /app && npm install
+FROM node:12.13-alpine
 WORKDIR /app
+COPY . .
+RUN npm install
 EXPOSE 80
 CMD ["npm", "start"]
 ```
 
-Note: il y a toujours plusieurs approches pour définir le fichier *Dockerfile* d'une application. On aurait par exemple pu partir d'une image de base comme *ubuntu* ou *alpine*, et installer le runtime *nodejs* comme dans l'exemple ci-dessous.
+Note: il y a toujours plusieurs approches pour définir le fichier *Dockerfile* d'une application. On aurait par exemple pu partir d'une image de base comme *ubuntu* ou *alpine*, et installer le runtime *nodejs* comme dans l'exemple ci-dessous:
 
 ```
-FROM alpine:3.8
-RUN apk update && apk add nodejs
-COPY . /app
-RUN cd /app && npm install
+FROM alpine:3.10
+RUN apk update && apk add nodejs-npm
 WORKDIR /app
+COPY . .
+RUN npm install
 EXPOSE 80
 CMD ["npm", "start"]
 ```
@@ -80,29 +80,6 @@ CMD ["npm", "start"]
 
 ```
 $ docker image build -t pong:1.0 .
-Sending build context to Docker daemon  7.168kB
-Step 1/6 : FROM node:10.15-alpine
- ---> 288d2f688643
-Step 2/6 : COPY . /app/
- ---> dbc76081fd62
-Step 3/6 : RUN cd /app && npm install
- ---> Running in 82048b4eee68
-Removing intermediate container 82048b4eee68
- ---> 68a5ed5f0bbd
-Step 4/6 : WORKDIR /app
- ---> Running in 126a6062e5bc
-Removing intermediate container 126a6062e5bc
- ---> db01c43f76dc
-Step 5/6 : EXPOSE 80
- ---> Running in 01ffbd9641f7
-Removing intermediate container 01ffbd9641f7
- ---> b1ffff2cf6dc
-Step 6/6 : CMD ["npm", "start"]
- ---> Running in db0bec23d302
-Removing intermediate container db0bec23d302
- ---> 17f2f66a6a20
-Successfully built 17f2f66a6a20
-Successfully tagged pong:1.0
 ```
 
 4. La commande suivante permet de lancer un container basé sur l'image *pong:1.0* et le rend accessible depuis le port 8080 de la machine hôte.
