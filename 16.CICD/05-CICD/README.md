@@ -125,7 +125,7 @@ We can see our dummy deployment in there.
 We will now deploy our application as a Docker Service with the following command (replace GITLAB_USER with your GitLab account and GITLAB_REPO with the name of the repository you created in the previous step):
 
 ```
-$ docker service create hi \
+$ docker service create \
   --name hi \
   --publish 8080:8000 \
   registry.gitlab.com/GITLAB_USER/GITLAB_REPO:latest
