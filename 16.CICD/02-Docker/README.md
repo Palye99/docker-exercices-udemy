@@ -43,7 +43,7 @@ CMD ["npm", "start"]
 ## Sample Dockerfile for a Go project
 
 ```
-FROM golang:1.12.-alpine as build
+FROM golang:1.12-alpine as build
 WORKDIR /app
 COPY main.go .
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main .

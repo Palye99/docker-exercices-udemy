@@ -21,7 +21,7 @@ docker container run alpine echo hello
 2. Le résultat de la commande précédente montre les différentes étapes qui sont effectuées:
 
 ```
-Unable to find image 'alpine:3.8' locally
+Unable to find image 'alpine:latest' locally
 latest: Pulling from library/alpine
 88286f41530e: Pull complete
 Digest: sha256:1072e499f3f655a032e88542330cf75b02e7bdf673278f701d7ba61629ee3ebe

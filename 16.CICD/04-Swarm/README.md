@@ -27,7 +27,7 @@ $ curl -L https://downloads.portainer.io/portainer-agent-stack.yml -o portainer-
 $ docker stack deploy --compose-file=portainer-agent-stack.yml portainer
 ```
 
-Open a web browser on http://VM_IP_ADDRESS:8080 to make sure Portainer is running
+Open a web browser on http://VM_IP_ADDRESS:9000 to make sure Portainer is running
 
 ![Portainer](./images/portainer-1.png)
 
