@@ -21,7 +21,7 @@ Utilisez pour cela la commande *commit* (*docker commit --help* pour voir le fon
 
 ## Correction
 
-1. La commande suivante permet de créé le container demandé
+1. La commande suivante permet de créer le container demandé
 
 On utilise l'option --name pour spécifier le nom du container.
 

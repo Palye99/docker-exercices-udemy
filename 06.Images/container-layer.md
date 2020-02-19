@@ -127,6 +127,11 @@ Vous pouvez maintenant sortir du container.
 
 ## Nettoyage
 
+Listez les containers (en exécution ou non) sur la machine hôte
+
+```
+$ docker container ls -a
+```
 
 Pour supprimer tous les containers, nous pouvons utiliser les commandes rm et ls -aq conjointement. Nous ajoutons l’option -f afin de forcer la suppression des containers encore en exécution. Il faudrait sinon arrêter les containers et les supprimer.
 
