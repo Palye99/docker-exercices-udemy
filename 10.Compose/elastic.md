@@ -122,39 +122,24 @@ Il n'y a pas encore de données dans Elasticsearch, Kibana n'est pas en mesure d
 
 ## Utilisation d'un fichier de logs de test
 
-Nous allons maintenant utiliser un fichier de log de test et envoyer son contenu dans Logstash, contenu qui sera donc filtrer et envoyé à Elasticsearch.
+Nous allons maintenant utiliser un fichier de log de test et envoyer son contenu dans Logstash, contenu qui sera donc filtré et envoyé à Elasticsearch.
 
-Récupérez en local le fichier nginx.log avec la commande suivante :
-
-```
-curl -s -o nginx.log https://gist.githubusercontent.com/lucj/83769b6a74dd29c918498d022442f2a0/raw
-```
-
-Ce fichier contient 500 entrées de logs au format Apache. Par exemple, la ligne suivante correspond à une requête :
-- reçue le 28 novembre 2018
-- de type GET
-- appelant l'URL https://mydomain.net/api/object/5996fc0f4c06fb000f83b7
-- depuis l'adresse IP 46.218.112.178
-- et depuis un navigateur Firefox
+Nous utilisons pour cela l'image *mingrammer/flog* afin de générer des entrées de log au format NGinx. Le fichier nginx.log généré contient 1000 entrées de logs.
 
 ```
-46.218.112.178 - - [28/Nov/2018:15:40:04 +0000] "GET /api/object/5996fc0f4c06fb000f83b7 HTTP/1.1" 200 501 "https://mydomain.net/map" "Mozilla/5.0 (Windows NT 10.0; WOW64; rv:55.0) Gecko/20100101 Firefox/55.0" "-"
+$ docker run mingrammer/flog > nginx.log
 ```
 
-On utilise alors la commande suivante pour envoyer chaque ligne à Logstash:
+La commande suivante permet d'envoyer chaque ligne à Logstash:
 
 ```
 while read -r line; do curl -s -XPUT -d "$line" http://localhost:8080; done < ./nginx.log
 ```
 
-Une fois le script terminé, allez dans le menu *discover* il vous sera demandé de créer un index. Ceci est maintenant possible car des entrées de logs ont été indéxées par Elasticsearch.
+Une fois le script terminé, allez dans le menu *discover* il vous sera demandé de créer un index (ceci est maintenant possible car des entrées de logs ont été indéxées par Elasticsearch).
 
 ![ELK](./images/elk2.png)
 ![ELK](./images/elk3.png)
-
-Assurez vous d'avoir une période de recherche assez large afin de couvrir la date de l'entrée que nous avons spécifiée, vous pouvez configurer cette période en haut à droite de l'interface.
-
-![ELK](./images/elk4.png)
 
 A partir de ces données, nous pouvons par exemple créer une visualisation permettant de lister les pays d'ou proviennent ces requêtes.
 
