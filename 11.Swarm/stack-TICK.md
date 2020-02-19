@@ -89,7 +89,7 @@ Créez le fichier *telegraf.conf* avec le contenu suivant:
 
 En quelques mots, ce fichier de configuration:
 - définit un endpoint http qui pourra être utilisé pour recevoir des données
-- spécifie que les données reçues seront sauvegardées dans un base de données nommée *test*
+- spécifie que les données reçues seront sauvegardées dans une base de données nommée *test*
 
 ## Déploiement de l'application
 
