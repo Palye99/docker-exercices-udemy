@@ -225,7 +225,7 @@ Notes:
 * il n’est pas non plus possible de scaler les services db et redis car ils spécifient tous les 2 l’option container_name, plusieurs containers ne peuvent pas avoir le même nom.
 
 ```
-$ docker-compose up --scale vote=3
+$ docker-compose up -d --scale vote=3
 ...
 ERROR: for examplevotingapp_vote_3  Cannot start service vote: driver failed programming external connectivity on endpoint examplevotingapp_vote_3 (b520da97c5736c46bfb2c80947fd2643387df0e0f67bbe18c226bad006dc940e): Bind for 0.0.0.0:5000 failed: port is already allocated
 ```
