@@ -9,15 +9,18 @@ Dans un Dockerfile, les instructions ENTRYPOINT et CMD peuvent être spécifiée
 * le format shell, ex: `ENTRYPOINT /usr/bin/node index.js`.
   Une commande spécifée dans ce format sera exécutée via un shell présent dans l’image. Cela peut notamment poser des problématiques car les signaux ne sont pas forwardés aux processus forkés.
 
-* le format exec, ex: `CMD [“node”, “index.js”]`.
+* le format exec, ex: CMD `["node", "index.js"]`.
   Une commande spécifiée dans ce format ne nécessitera pas la présence d’un shell dans l’image. On utilisera souvent le format exec pour ne pas avoir de problème si aucun shell n’est présent.
 
 ## Ré-écriture à l’exécution d’un container
 
 ENTRYPOINT et CMD sont 2 instructions du Dockerfile, mais elle peuvent cependant être écrasées au lancement d’un container:
 
-* pour spécifier une autre valeur pour l’ENTRYPOINT, on utilisera l’option --entrypoint, par exemple: `docker container run –entrypoint echo alpine`
-* pour spécifier une autre valeur pour CMD, on précisera celle-ci après le nom de l’image, par exemple: `docker container run alpine echo “hello”`
+* pour spécifier une autre valeur pour l’ENTRYPOINT, on utilisera l’option --entrypoint, par exemple:
+`docker container run --entrypoint echo alpine`
+
+* pour spécifier une autre valeur pour CMD, on précisera celle-ci après le nom de l’image, par exemple:
+`docker container run alpine echo "hello"`
 
 ## Instruction ENTRYPOINT utilisée seule
 
