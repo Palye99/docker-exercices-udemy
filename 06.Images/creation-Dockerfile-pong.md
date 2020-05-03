@@ -15,7 +15,7 @@
 - spécification de la commande à exécuter pour lancer le serveur
 
 
-3. Construire l’image en la taguant *pong:v1.0*
+3. Construire l’image en la taguant *pong:v1.0*
 
 4. Lancez un container basé sur cette image en publiant le port 80 sur le port 8080 de la machine hôte
 
