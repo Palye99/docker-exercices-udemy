@@ -8,7 +8,7 @@ Création d’un repository sur le Docker Hub
 
 3. Effectuez un login depuis la ligne commande en spécifiant vos identifiants Docker Hub
 
-4. Créez une image contenant un petit serveur web dans le language de votre choix et taggez la avec USERNAME/www:1.0
+4. Utilisez une image présente en local et taggez la avec USERNAME/www:1.0 (utilisez pour cela la commande `docker image tag`)
 
 5. Uploadez l’image USERNAME/www:1.0 sur le Docker Hub
 
@@ -41,51 +41,14 @@ Password:
 Login Succeeded
 ```
 
-4. Exemple de serveur web simple en Node.js
+4. Sélectionnez une image présente en local (par exemple *ubuntu*, *alpine*, ... ou bien toute autre image que vous avez déjà downloadée ou créée).
 
-Fichier **index.js**:
+En utilisant la commande suivante, créez un nouveau tag *USERNAME/www:1.0* qui identifie cette image:
 
-```
-var express = require('express');
-var util    = require('util');
-var os      = require('os');
-var app = express();
-app.get('/', function(req, res) {
-    res.setHeader('Content-Type', 'text/plain');
-    res.end(util.format("hello from %s", os.hostname()));
-});
-app.listen(80);
-```
-
-Fichier **package.json**:
-```
-{
-  "name": "hello",
-  "version": "0.0.1",
-  "main": "index.js",
-  "scripts": {
-    "start": "node index.js"
-  },
-   "dependencies": {  "express": "^4.14.0" }
-}
-```
-
-Fichier **Dockerfile**:
-```
-FROM node:8.11-alpine
-COPY package.json /app/package.json
-RUN cd /app && npm install
-COPY . /app/
-WORKDIR /app
-EXPOSE 80
-CMD ["npm", "start"]
-```
-
-La commande suivante permet de builder l'image et de la tagger avec **USERNAME/www:1.0**
-(modifiez USERNAME avec votre propre nom d'utilisateur)
+Note: modifiez IMAGE par l'image locale que vous avez sélectionnée et USERNAME avec votre nom d'utilisateur sur le Docker Hub.
 
 ```
-$ docker image build -t USERNAME/www:1.0 . 
+$ docker image tag IMAGE USERNAME/www:1.0 
 ```
 
 5. Afin d'uploader l'image sur le Docker Hub, on utilise la sous-commande push

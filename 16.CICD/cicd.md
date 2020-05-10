@@ -562,7 +562,7 @@ A la fin du fichier, ajoutez également l'étape *deploy-swarm* qui sera exécut
 ```
 deploy-swarm:
   stage: deploy
-  image:
+  image: alpine:3.9
   script:
     - apk add --update curl
     - curl -XPOST $PORTAINER_WEBHOOK
@@ -570,7 +570,7 @@ deploy-swarm:
 
 La seule action de cette étape est d'appeler le webhook définit par Portainer en envoyant une requête POST sur l'URL associée au service.
 
-Faite ensuite un changement dans le code de votre application, modifiez par exemple la chaine de caratères retournée (assurez-vous de modifier la desdcription du test en même temps). Commitez ces changements et envpoyer le code sur GitLab.
+Faite ensuite un changement dans le code de votre application, modifiez par exemple la chaine de caratères retournée (assurez-vous de modifier la description du test en même temps). Commitez ces changements et envoyer le code sur GitLab.
 
 Vérifiez enfin que la nouvelle version de votre application a été correctement déployée.
 

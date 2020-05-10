@@ -1,10 +1,10 @@
 # Voting application
 
-Dans ce lab, nous allons illustrer l’utilisation de Docker Compose et lancer l’application Voting App de Docker. Cette application est très utilisée pour des présentations et démos.
+Dans ce lab, nous allons illustrer l’utilisation de *Docker Compose* et lancer l’application *Voting App* de Docker. Cette application est très utilisée pour des présentations et démos, c'est un bon exemple d'application micro-services simple.
 
 ## Vue d’ensemble
 
-L’application Voting App est une application micro-services composées de 5 services.
+L’application *Voting App* est composée de 5 micro-services.
 
 ![Voting App architecture](./images/voting_app_architecture.png)
 
@@ -12,7 +12,7 @@ L’application Voting App est une application micro-services composées de 5 se
 * redis: database redis dans laquelle sont stockés les votes
 * worker: service qui récupère les votes depuis redis et met les résultats dans une database postgres
 * db: database postgres dans laquelle sont stockés les résultats
-* result: front-end permettant de visualser les résutlats
+* result: front-end permettant de visualiser les résultats
 
 ## Clone du repository GitHub
 
@@ -23,11 +23,26 @@ $ git clone https://github.com/docker/example-voting-app
 $ cd example-voting-app
 ```
 
-## docker-compose.yml
+## Installation du binaire docker-compose
 
-Plusieurs fichiers, au format Docker Compose, sont disponibles. Chacun décrivant l’application avec une complexitée plus ou moins importante..
+- si vous utilisez *Docker for Mac* ou *Docker for Windows*, le binaire *docker-compose* est déjà installé
 
-Nous utilisons ici le fichier docker-compose.yml qui est le fichier par défaut.
+- si vous utilisez un autre environnement, installez la dernière version de *docker-compose* en suivant les instructions détaillées à l'adresse suivante [https://docs.docker.com/compose/install/](https://docs.docker.com/compose/install/)
+
+Vérifiez que le binaire est correctement installé avec la commande suivante:
+
+```
+$ docker-compose version
+```
+
+Note: si vous êtes sur Linux et que la commande *docker-compose* est lente, le workaround suivant pourrait vous aider [https://github.com/docker/compose/issues/6552#issuecomment-529787442](https://github.com/docker/compose/issues/6552#issuecomment-529787442)
+
+
+## Le format de fichier docker-compose.yml
+
+Plusieurs fichiers, au format Docker Compose, sont disponibles dans le repository de la Voting App. Ils décrivent l’application  pour différents environnements et avec différents niveaux de complexité.
+
+Nous utilisons ici le fichier *docker-compose.yml* qui est le fichier par défaut.
 
 ```
 version: "3"
@@ -77,13 +92,13 @@ networks:
   back-tier:
 ```
 
-Ce fichier est très intéressant car il défini également des volumes et networks en plus des services.
+Ce fichier est très intéressant car il définit également des volumes et networks en plus des services.
 
-Ce n’est cependant pas un fichier destiné à être lancé en production car pour les services vote, result et worker il utilise le code local et non des images releasées.
+Ce n’est cependant pas un fichier destiné à être lancé en production notamment parce qu'il utilise le code local et non des images releasées pour les services *vote*, *result* et *worker*.
 
 ## Lancement de l’application
 
-Lancer l’application à partir du fichier docker-compose.yml est très simple, il suffit de lancer la commande suivante:
+Lancer l’application à partir du fichier *docker-compose.yml* est très simple, il suffit de lancer la commande suivante:
 
 ```
 $ docker-compose up -d
@@ -123,12 +138,12 @@ Creating db
 Les étapes réalisées lors du lancement de l’application sont les suivantes:
 * création du volume
 * création des networks
-* contruction des images pour les services custom (vote, worker, result) et récupération des images redis et postgres
+* construction des images pour les services *vote*, *worker* et *result* et récupération des images *redis* et *postgres*
 * lancement de containers pour chaque service
 
-## Les containers
+## Les containers lancés
 
-Avec la commande suivane, listez les containers qui ont été lancés.
+Avec la commande suivante, listez les containers qui ont été lancés.
 
 ```
 $ docker-compose ps
@@ -141,9 +156,9 @@ examplevotingapp_worker_1   /bin/sh -c dotnet src/Work ...   Up
 redis                       docker-entrypoint.sh redis ...   Up      0.0.0.0:32768->6379/tcp
 ```
 
-## Les volumes
+## Les volumes créés
 
-Listez les volumes avec la CLI, et vérifiez que le volume défini dans le fichier docker-compose.yml est présent.
+Listez les volumes avec la CLI, et vérifiez que le volume défini dans le fichier *docker-compose.yml* est présent.
 
 ```
 $ docker volume ls
@@ -156,11 +171,11 @@ DRIVER              VOLUME NAME
 local               examplevotingapp_db-data
 ```
 
-Le nom du volume est préfixé par le répertoire dans lequel le fichier Compose est présent.
+Le nom du volume est préfixé par le répertoire dans lequel le fichier Compose est présent. Par défaut ce volume correspond à un répertoire créé sur la machine hôte.
 
-## Les networks
+## Les networks créés
 
-Listez les networks avec la CLI. Les deux networks définis dans le fichier docker-compose.yml sont présents.
+Listez les networks avec la CLI. Les deux networks définis dans le fichier *docker-compose.yml* sont présents.
 
 ```
 $ docker network ls
@@ -177,7 +192,7 @@ cfb848586437        host                          host                local
 42843cd0d2cf        none                          null                local
 ```
 
-Note: comme nous sommes dans le contexte d’un hôte unique (et non dans le contexte d’un cluster Swarm), le driver utilisé pour la création de ces networks est du type bridge. Il permet la communication entre les containers tournant sur une même machine..
+Note: comme nous sommes dans le contexte d’un hôte unique (et non dans le contexte d’un cluster Swarm), le driver utilisé pour la création de ces networks est du type bridge. Il permet la communication entre les containers tournant sur une même machine.
 
 ## Utilisation de l’application
 
@@ -195,18 +210,18 @@ Si vous avez lancé cette application sur un autre hôte que votre machine, vous
 
 ## Scaling du service worker
 
-Par défaut, un container est instantié pour chaque service. Il est possible, avec la commande scale de changer ce comportement et de scaler un service une fois qu’il est lancé.
+Par défaut, un container est lancé pour chaque service. Il est possible, avec l'option *--scale*, de changer ce comportement et de scaler un service une fois qu’il est lancé.
 
 Avec la commande suivante, augmenter le nombre de worker à 2.
 
 ```
-$ docker-compose up --scale worker=2
+$ docker-compose up -d --scale worker=2
 Starting examplevotingapp_worker_1 ... done
 Creating examplevotingapp_worker_2 ...
 Creating examplevotingapp_worker_2 ... done
 ```
 
-Listez les containers présent. Les 2 containers relatifs au service worker sont présent.
+Les 2 containers relatifs au service *worker* sont présents:
 
 ```
 $ docker-compose ps
@@ -221,8 +236,8 @@ redis                       docker-entrypoint.sh redis ...   Up         0.0.0.0:
 ```
 
 Notes:
-* il n’est pas possible de scaler les services vote et result car ils spécifient tous les 2 un port, plusieurs containers ne peuvent pas utiliser le même port de la machine hôte
-* il n’est pas non plus possible de scaler les services db et redis car ils spécifient tous les 2 l’option container_name, plusieurs containers ne peuvent pas avoir le même nom.
+* il n’est pas possible de scaler les services *vote* et *result* car ils spécifient tous les 2 un port, plusieurs containers ne peuvent pas utiliser le même port de la machine hôte
+* il n’est pas non plus possible de scaler les services *db* et *redis* car ils spécifient tous les 2 l’option *container_name*, plusieurs containers ne peuvent pas avoir le même nom.
 
 ```
 $ docker-compose up -d --scale vote=3
@@ -231,14 +246,14 @@ ERROR: for examplevotingapp_vote_3  Cannot start service vote: driver failed pro
 ```
 
 ```
-docker-compose up --scale redis=2
+docker-compose up -d --scale redis=2
 ...
 ERROR: for redis  Cannot create container for service redis: Conflict. The container name "/redis" is already in use by container "ff7ffbbebc3f4441a6b93c9a06389367b552b010bd62377931372ec2da0d4d59". You have to remove (or rename) that container to be able to reuse that name.
 ```
 
 ## Suppression de l’application
 
-Avec la commande suivante, stoppez l’application. Cette commande supprime l’ensemble des éléments créés précédemment sauf les volumles.
+Avec la commande suivante, stoppez l’application. Cette commande supprime l’ensemble des éléments créés précédemment à l'exception des volumes (afin de ne pas perdre de données)
 
 ```
 $ docker-compose down
@@ -264,8 +279,8 @@ $ docker-compose down -v
 
 ## Résumé
 
-Cet exemple illustre l’utilisation de Docker Compose sur l’exemple bien connu de la Voting App dans le cadre d’un hôte unique. Pour déployer cette application sur un environnement de production, il faudrait effectuer des modifications dans le fichier docker-compose, par exemple:
+Cet exemple illustre l’utilisation de *Docker Compose* sur l’exemple bien connu de la Voting App dans le cadre d’un hôte unique. Pour déployer cette application sur un environnement de production, il faudrait effectuer des modifications dans le fichier docker-compose, par exemple:
 * utilisation d’images pour les services
-* ajout de service supplémentaires (aggregateur de logs, terminaison ssl, …)
-* contraintes de deploiement
+* ajout de service supplémentaires (aggr&gateur de logs, terminaison ssl, …)
+* contraintes de déploiement
 * ...

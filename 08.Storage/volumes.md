@@ -7,13 +7,19 @@ Dans ce lab, nous allons illustrer la notion de volume. Nous verrons notamment c
 
 ## Prérequis
 
-Si vous utilisez Docker for Mac ou Docker for Windows, la plateforme Docker est installée dans une machine virtuelle tournant sur un hyperviseur léger (*xhyve* pour macOS, *Hyper-V* pour Windows). Pour effectuer ce lab il vous faudra utiliser la commande suivante pour accéder à un shell dans cette machine virtuelle.
+- Installation de *jq*
+
+Pour certaines commandes vous aurez besoin de l'utilitaire *jq* qui permet de manipuler des structures json très facilement. Vous pouvez l'installer depuis [https://stedolan.github.io/jq/download/](https://stedolan.github.io/jq/download/)
+
+- Si vous utilisez Docker for Mac ou Docker for Windows
+
+la plateforme Docker est installée dans une machine virtuelle tournant sur un hyperviseur léger (*xhyve* pour macOS, *Hyper-V* pour Windows). Pour effectuer ce lab il vous faudra utiliser la commande suivante pour accéder à un shell dans cette machine virtuelle.
 
 ```
 $ docker run -it --privileged --pid=host debian nsenter -t 1 -m -u -n -i sh
 ```
 
-Comme nous l'avons évoqué dans le cours, cette commande permet de lancer un shell dans un container basé sur debian, et faire en sorte d'utiliser les namespaces de la machine hôte (la machine virtuelle) sur laquelle tourne le daemon Docker.
+Comme nous l'avons évoqué dans le cours, cette commande permet de lancer un shell dans un container basé sur *debian*, et faire en sorte d'utiliser les namespaces de la machine hôte (la machine virtuelle) sur laquelle tourne le daemon Docker.
 
 Une fois que vous avez lancé ce container, vous pourrez naviguer dans le filesystem de la machine sur laquelle tourne le daemon Docker, c'est à dire l'endroit ou les images sont stockées.
 

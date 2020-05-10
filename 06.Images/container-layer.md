@@ -110,12 +110,12 @@ $ docker container exec -ti CONTAINER_ID bash
 Vérifez que figlet est présent dans ce container.
 
 ```
-# figlet I'm here !
-___ _             _                     _
-|_ _( )_ __ ___   | |__   ___ _ __ ___  | |
-| ||/| '_ ` _ \  | '_ \ / _ \ '__/ _ \ | |
-| |  | | | | | | | | | |  __/ | |  __/ |_|
-|___| |_| |_| |_| |_| |_|\___|_|  \___| (_)
+# figlet Hola
+ _   _       _
+| | | | ___ | | __ _
+| |_| |/ _ \| |/ _` |
+|  _  | (_) | | (_| |
+|_| |_|\___/|_|\__,_|
 
 ```
 
