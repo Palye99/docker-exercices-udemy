@@ -127,7 +127,7 @@ Nous allons maintenant utiliser un fichier de log de test et envoyer son contenu
 Nous utilisons pour cela l'image *mingrammer/flog* afin de générer des entrées de log au format NGinx. Le fichier nginx.log généré contient 1000 entrées de logs.
 
 ```
-$ docker run mingrammer/flog > nginx.log
+$ docker run mingrammer/flog -f apache_combined > nginx.log
 ```
 
 La commande suivante permet d'envoyer chaque ligne à Logstash:
