@@ -23,7 +23,7 @@ $ curl localhost:8080
 {"message":"a7594b091cb8 suggests to visit Evemohu"}
 ```
 
-Dans la suite, nous utiliserons un fichier au format Compose dans lequel nous définierons l'API ainsi qu'un service additionel qui aura le rôle de reverse-proxy, basé sur *nginx* et assurant la terminaison SSL/TLS.
+Dans la suite, nous utiliserons un fichier au format Compose dans lequel nous définirons l'API ainsi qu'un service additionel qui aura le rôle de reverse-proxy, basé sur *nginx* et assurant la terminaison SSL/TLS.
 
 ## Authorité de certification (CA)
 
@@ -49,7 +49,18 @@ Lancez la commande suivante afin de créer un certificat autosigné pour notre C
 $ openssl req -new -x509 -days 365 -key ca-key.pem -sha256 -subj "/C=FR/L=Nice/O=MyOrg/CN=ca" -out ca.pem
 ```
 
-Maintenant que nous avons créé la paire de clé publique / clé privée de notre CA, nous allons pouvoir les utiliser pour signer le certificat que nous déployerons sur notre serveur. Ce certificat permettra à un client web d'authentifier le serveur avec lequel il communique.
+---
+Note: si vous obtenez l'erreur suivante lors du lancement de cette commande
+
+```
+Can't load /root/.rnd into RNG
+140300986950080:error:2406F079:random number generator:RAND_load_file:Cannot open file:../crypto/rand/randfile.c:88:Filename=/root/.rnd
+```
+
+il vous faudra éditer le fichier */etc/ssl/openssl.cnf* et commenter la ligne *RANDFILE = $ENV::HOME/.rnd* qui se trouve au début du fichier.
+---
+
+Maintenant que nous avons créé la paire de clé publique / clé privée de notre CA, nous allons pouvoir les utiliser pour signer le certificat que nous déploierons sur notre serveur. Ce certificat permettra à un client web d'authentifier le serveur avec lequel il communique.
 
 Note: comme nous le verrons par la suite, nous aurons une exception de sécurité dans notre navigateur web car le certificat n'est pas signé par un CA connu. L'utilisation d'un CA du marché (et donc généralement connu par les navigateurs web) permettrait de résoudre ce problème
 
@@ -89,10 +100,10 @@ Nous allons voir dans la suite comment les utiliser.
 
 ### Configuration Nginx
 
-Afin de configurer notre reverse-proxy et lui donner la fonction de terminaison SSL/TLS, créez un fichier nginx.conf avec le contenu suivant:
+Afin de configurer notre reverse-proxy et lui donner la fonction de terminaison SSL/TLS, créez un fichier *nginx.conf* avec le contenu suivant:
 
 ```
-user www-data;
+user nginx;
 worker_processes 4;
 pid /run/nginx.pid;
 
@@ -172,24 +183,15 @@ Créez le fichier _docker-stack.yml_ avec le contenu suivant. Ce fichier défini
 version: '3.3'
 services:
   proxy:
-    image: nginx:1.12.2
+    image: nginx:1.16
     configs:
       - source: server_config
         target: /etc/nginx/nginx.conf
-        mode: 0444
-        uid: '33'
-        gid: '33'
       - source: server_cert
         target: /etc/ssl/certs/server.crt
-        mode: 0444
-        uid: '33'
-        gid: '33'
     secrets:
       - source: server_key
         target: /etc/ssl/certs/server.key
-        mode: 0400
-        uid: '33'
-        gid: '33'
     ports:
       - "80:80"
       - "443:443"
@@ -211,7 +213,7 @@ secrets:
     file: ./server-key.pem
 ```
 
-Ce fichier n'est pas si compliqué qu'il en a l'air. Il défini:
+Ce fichier définit:
 - une application composée de 2 services (*proxy* et *app*)
 - deux configurations, la première basée sur le fichier _nginx.conf_, la seconde sur le fichier _server_cert.pem_
 - un secret basé sur le contenu du fichier _server-key.pem_
@@ -235,7 +237,7 @@ Après quelques secondes, les services sont disponibles:
 $ docker service ls
 ID            NAME       MODE        REPLICAS  IMAGE          PORTS
 34i48r08zjdn  app_api    replicated  1/1       lucj/city:1.0
-jngcz7xtwumi  app_proxy  replicated  1/1       nginx:1.12.2   *:80->80/tcp,*:443->443/tcp
+jngcz7xtwumi  app_proxy  replicated  1/1       nginx:1.16     *:80->80/tcp,*:443->443/tcp
 ```
 
 Nous pouvons maintenant ouvrir un navigateur web, aller sur *http://city.com* et constater un message d'erreur qui nous informe que la connexion n'est pas sécurisée. Cela vient du fait que le CA que nous avons utilisé pour signer le certificat du serveur n'est pas connu par le navigateur.
