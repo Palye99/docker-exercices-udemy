@@ -171,7 +171,7 @@ DRIVER              VOLUME NAME
 local               examplevotingapp_db-data
 ```
 
-Le nom du volume est préfixé par le répertoire dans lequel le fichier Compose est présent. Par défaut ce volume correspond à un répertoire créé sur la machine hôte.
+Par défaut ce volume correspond à un répertoire créé sur la machine hôte.
 
 ## Les networks créés
 
