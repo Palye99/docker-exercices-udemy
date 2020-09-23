@@ -294,7 +294,7 @@ Utilisez la commande suivante pour lancer un container basé sur *nginx* et mont
 Note: */usr/share/nginx/html* est le répertoire servi par défaut par nginx, il contient  les fichiers *index.html* et *50x.html*.
 
 ```
-$ docker run --name www -d -p 8080:80 -v html:/usr/share/nginx/html nginx
+$ docker run --name www -d -p 8080:80 -v html:/usr/share/nginx/html nginx:1.16
 ```
 
 Depuis l’hôte, regardez le contenu du volume *html*.

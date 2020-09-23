@@ -50,14 +50,17 @@ $ openssl req -new -x509 -days 365 -key ca-key.pem -sha256 -subj "/C=FR/L=Nice/O
 ```
 
 ---
-Note: si vous obtenez l'erreur suivante lors du lancement de cette commande
+:fire: si vous obtenez l'erreur suivante lors du lancement de cette commande
 
 ```
 Can't load /root/.rnd into RNG
 140300986950080:error:2406F079:random number generator:RAND_load_file:Cannot open file:../crypto/rand/randfile.c:88:Filename=/root/.rnd
 ```
 
-il vous faudra éditer le fichier */etc/ssl/openssl.cnf* et commenter la ligne *RANDFILE = $ENV::HOME/.rnd* qui se trouve au début du fichier.
+il vous faudra éditer le fichier */etc/ssl/openssl.cnf* et commenter la ligne suivante
+```
+RANDFILE = $ENV::HOME/.rnd
+```
 ---
 
 Maintenant que nous avons créé la paire de clé publique / clé privée de notre CA, nous allons pouvoir les utiliser pour signer le certificat que nous déploierons sur notre serveur. Ce certificat permettra à un client web d'authentifier le serveur avec lequel il communique.
