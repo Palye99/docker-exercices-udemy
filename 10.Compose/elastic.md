@@ -22,33 +22,39 @@ Note: nous considérerons que les fichiers de log sont générés par un serveur
 Afin de définir notre stack ELK, créez un répertoire *elk* et, à l'intérieur de celui-ci, le fichier docker-compose.yml avec le contenu suivant:
 
 ```
-version: '3.6'
+version: '3.8'
 services:
   logstash:
-    image: logstash:6.7.1
+    image: logstash:7.8.0
+    environment:
+      discovery.seed_hosts: logstash
+      LS_JAVA_OPTS: "-Xms512m -Xmx512m"
     volumes:
       - ./logstash.conf:/config/logstash.conf
     command: ["logstash", "-f", "/config/logstash.conf"]
     ports:
       - 8080:8080
   elasticsearch:
-    image: elasticsearch:6.7.1
+    image: elasticsearch:7.8.0
+    environment:
+      discovery.type: single-node
+      ES_JAVA_OPTS: "-Xms512m -Xmx512m"
   kibana:
-    image: kibana:6.7.1
+    image: kibana:7.8.0
     ports:
       - 5601:5601
 ```
 
 Note:
 
-- Le service Logstash est basé sur l'image officielle logstash:6.7.1.
-Nous précisons sous la clé volumes le fichier de configuration logstash.conf présent dans le répertoire est monté sur /config/logstash.conf dans le container afin d'être pris en compte au démarrage
+- Le service Logstash est basé sur l'image officielle logstash:7.8.0.
+Nous précisons, sous la clé volumes, que le fichier de configuration logstash.conf présent dans le répertoire est monté sur /config/logstash.conf dans le container. Il sera pris en compte par Logstash au démarrage
 
-- Le service Kibana est basé sur l'image officielle kibana:6.7.1. Le mapping de port permettra à l'interface web d'être disponible sur le port 5601 de la machine hôte.
+- Le service Kibana est basé sur l'image officielle kibana:7.8.0. Le mapping de port permettra à l'interface web d'être disponible sur le port 5601 de la machine hôte.
 
 ## Fichier de configuration de Logstash
 
-Afin de pouvoir indexer des fichiers de logs existant, nous allons configurer Logstash. Dans le réperoire *elk* (ou se trouve le fichier docker-compose.yml), créez le fichier logstash.conf avec le contenu suivant
+Afin de pouvoir indexer des fichiers de logs existant, nous allons configurer Logstash. Dans le répertoire *elk* (ou se trouve le fichier docker-compose.yml), créez le fichier logstash.conf avec le contenu suivant
 
 ```
 input {
@@ -88,7 +94,7 @@ output {
 ```
 
 Ce fichier peu sembler un peu compliqué. Il peut être découpé en 3 parties:
-* input: permet de spécifier les données d'entrée. Nous spécifions ici que logstash peut recevoir des données (entrées de logs)  sur du http
+* input: permet de spécifier les données d'entrée. Nous spécifions ici que Logstash peut recevoir des données (entrées de logs)  sur du http
 
 * filter: permet de spécifier comment les données d'entrée doivent être traitées avant de passer à l'étape suivante. Plusieurs instructions sont utilisées ici:
   * grok permet de spécifier comment chaque entrée doit être parsée. De nombreux parseurs sont disponibles par défaut et nous spécifions ici (avec COMBINEDAPACHELOG) que chaque ligne doit être parsée suivant un format de log apache, cela permettra une extraction automatique des champs comme l'heure de création, l'url de la requête, l'ip d'origine, le code retour, ...
@@ -118,39 +124,46 @@ L'interface web de Kibana est alors accessible sur le port 5601 de la machine h�
 
 ![ELK](./images/elk1.png)
 
-Il n'y a pas encore de données dans Elasticsearch, Kibana n'est pas en mesure de détecter un index.
+Cliquez sur l'option permettant de manipuler vos propres données
+
+![ELK](./images/elk2.png)
+
+Sur la page suivante, vous pourrez avoir un aperçu de toutes les fonctionnalités disponibles.
+Cliquez sur *Discover*.
+
+![ELK](./images/elk3.png)
+
+Cette page montre qu'il n'y a pas encore de données dans Elasticsearch, Kibana n'est pas en mesure de détecter un index.
 
 ## Utilisation d'un fichier de logs de test
 
-Nous allons maintenant utiliser un fichier de log de test et envoyer son contenu dans Logstash, contenu qui sera donc filtré et envoyé à Elasticsearch.
+Nous allons maintenant utiliser un fichier de log de test et envoyer son contenu dans Logstash, contenu qui sera filtré et envoyé à Elasticsearch.
 
-Nous utilisons pour cela l'image *mingrammer/flog* afin de générer des entrées de log au format NGinx. Le fichier nginx.log généré contient 1000 entrées de logs.
+Nous utilisons pour cela l'image *mingrammer/flog* afin de générer des entrées de log au format Nginx. Le fichier nginx.log généré contient 1000 entrées de logs.
 
 ```
 $ docker run mingrammer/flog -f apache_combined > nginx.log
 ```
 
-La commande suivante permet d'envoyer chaque ligne à Logstash:
+La commande suivante permet d'envoyer chaque ligne à Logstash (assurez-vous d'avoir remplacé HOST par l'adresse IP de la machine sur laquelle la stack Elastic a été lancée)
 
 ```
-while read -r line; do curl -s -XPUT -d "$line" http://localhost:8080; done < ./nginx.log
+while read -r line; do curl -s -XPUT -d "$line" http://HOST:8080; done < ./nginx.log
 ```
 
-Une fois le script terminé, allez dans le menu *discover* il vous sera demandé de créer un index (ceci est maintenant possible car des entrées de logs ont été indéxées par Elasticsearch).
+:fire: vous devriez voir une succession de *ok* s'afficher, cela permet simplement de s'assurer que l'envoi des entrées de log s'est déroulée correctement
 
-![ELK](./images/elk2.png)
-![ELK](./images/elk3.png)
+Une fois le script terminé, cliquez sur le bouton permettant de rafraichir les données. Vous pourrez alors créer un index.
 
-A partir de ces données, nous pouvons par exemple créer une visualisation permettant de lister les pays d'ou proviennent ces requêtes.
-
+![ELK](./images/elk4.png)
 ![ELK](./images/elk5.png)
 
-En allant un peu plus loin, nous pouvons, pour chaque pays, faire un découpage supplémentaire sur le code retour de la requête.
+Depuis le menu *Discover* vous pourrez alors voir les logs que vous avez envoyés précédemment.
 
 ![ELK](./images/elk6.png)
+![ELK](./images/elk7.png)
 
-Nous pourrions ensuite, grace aux filtres, voir de quels pays proviennent les requêtes dont le code de retour est 401 (Unauthorized).
 
 ## En résumé
 
-Nous avons vu ici une nouvelle fois la puissance et la facilité d'utilisation de Docker Compose. En peu de temps nous avons déployé et utilisé une stack ELK. Bien sur, ce que l'on a vu ici n'est qu'un aperçu. Je vous invite à utiliser d'autres fichiers de log, à modifier la configuration de logstash, à créer d'autres visualisation et des dashboard regroupant plusieurs visualisations. Cela vous permettra de découvrir d'autres fonctionnalités parmi les nombreuses qui sont disponibles.
+Nous avons vu ici la facilité de déploiement de la stack Elastic à l'aide de Docker Compose. Je vous invite à naviguer dans l'interface de Kibana afin d'avoir une vue globale des nombreuses fonctionnalités qui sont disponibles.

@@ -217,14 +217,11 @@ secrets:
 ```
 
 Ce fichier définit:
-- une application composée de 2 services (*proxy* et *app*)
+- une application composée de 2 services (*proxy* et *api*)
 - deux configurations, la première basée sur le fichier _nginx.conf_, la seconde sur le fichier _server_cert.pem_
 - un secret basé sur le contenu du fichier _server-key.pem_
 
-Config et Secret sont alors montés dans le container du service *proxy*. Plusieurs choses sont spécifiées:
-- le point de montage dans le container
-- les droits de l'élément
-- l'utilisateur auquel est associé l'élément (ici *www-data* dont l'uid:gid correspond à *33:33*)
+Les Config et le Secret sont montés dans le système de fichiers du container du service *proxy*
 
 ## Test
 
