@@ -112,7 +112,7 @@ $ docker container run -d --name c1 alpine:3.8 sleep 10000
 
 Note: nous spécifions sleep 10000 dans la commande de façon à ce que le processus de PID 1 de ce container tourne quelques temps
 
-Avec la commande suivante, récupérer la configuration réseau de ce container (nous utilisons la notation Go template pour récupérer directement le champ qui nous intéresse (.NetworkdSetings.Networks).
+Avec la commande suivante, récupérer la configuration réseau de ce container (nous utilisons la notation Go template pour récupérer directement le champ qui nous intéresse (.NetworkSetings.Networks).
 
 ```
 $ docker container inspect -f "{{ json .NetworkSettings.Networks }}" c1 | jq .
@@ -422,7 +422,7 @@ Un network de type macvlan donne à chaque container un accès direct à une int
 
 ![Macvlan](./images/net-macvlan.png)
 
-Un network de type macvlan peut être créé avec la commande docker network create en spécifiant l’option **-–network=macvlan**.
+Un network de type macvlan peut être créé avec la commande docker network create en spécifiant l’option **-–driver=macvlan**.
 
 Créez un network de type **macvlan**, nommé **mvnet** avec la commande suivante:
 

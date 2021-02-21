@@ -9,7 +9,7 @@ Nous allons utiliser l’image officielle du registry disponible dans le Docker 
 A partir de l’image *registry:2.6*, lançez un container en précisant qu’il doit tourner en background et exposer son port 5000 sur le port 5000 de la machine hôte.
 
 ```
-$ docker container run -d -p 5000:5000 registry:2.6
+$ docker container run --name registry -d -p 5000:5000 registry:2.6
 ```
 
 ## Liste des images du registry
@@ -76,6 +76,14 @@ Si vous listez une nouvelle fois les images présentes dans le registry, vous po
 ```
 curl localhost:5000/v2/_catalog
 {"repositories":["w3"]}
+```
+
+## Cleanup
+
+Supprimez le registry avec la commande suivante:
+
+```
+$ docker container rm -f registry
 ```
 
 ## En résumé

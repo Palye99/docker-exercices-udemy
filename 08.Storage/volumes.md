@@ -108,7 +108,7 @@ Construisez l'image *imgvol* à partir de ce Dockerfile.
 
 ```
 $ docker image build -t imgvol .
-ending build context to Docker daemon  2.048kB
+Sending build context to Docker daemon  2.048kB
 Step 1/2 : FROM alpine:3.8
  ---> 3f53bb00af94
 Step 2/2 : VOLUME ["/data"]
