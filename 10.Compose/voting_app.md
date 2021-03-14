@@ -25,6 +25,8 @@ $ cd example-voting-app
 
 ## Installation du binaire docker-compose
 
+:fire: si vous êtes sur Linux, n'installez pas *docker-compose* avec *apt-get*, vous auriez une version trop ancienne
+
 - si vous utilisez *Docker for Mac* ou *Docker for Windows*, le binaire *docker-compose* est déjà installé
 
 - si vous utilisez un autre environnement, installez la dernière version de *docker-compose* en suivant les instructions détaillées à l'adresse suivante [https://docs.docker.com/compose/install/](https://docs.docker.com/compose/install/)
