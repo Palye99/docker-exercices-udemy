@@ -158,4 +158,4 @@ $ curl localhost:8080/who
 7562306c6c5e
 ```
 
-Pour cette simple application, le multistage build a permit de supprimer 270M de binaires et librairies dont la présence est inutile dans l'image finale. L'exemple d'une application écrite en **go** est extrème, mais le multistage build fait partie des bonnes pratiques à adopter quel que soit le language de développement de l'application. 
+Pour cette simple application, le multistage build a permit de supprimer 270M de binaires et librairies dont la présence est inutile dans l'image finale. L'exemple d'une application écrite en **go** est extrème, mais le multistage build fait partie des bonnes pratiques à adopter quel que soit le language de développement de l'application.
