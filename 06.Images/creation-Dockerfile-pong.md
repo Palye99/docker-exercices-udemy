@@ -21,6 +21,8 @@
 
 5. Tester l'application
 
+6. Supprimez le container
+
 
 ## Correction
 
@@ -85,7 +87,7 @@ $ docker image build -t pong:1.0 .
 4. La commande suivante permet de lancer un container basé sur l'image *pong:1.0* et le rend accessible depuis le port 8080 de la machine hôte.
 
 ```
-$ docker container run -d -p 8080:80 pong:1.0
+$ docker container run --name pong -d -p 8080:80 pong:1.0
 a42b30cf27490d73d795103c6b28285dd01785933b82ee6404121c7cd743cb5b
 ```
 
@@ -96,4 +98,10 @@ Note: assurez-vous que le port n'est pas déjà pris par un autre container ou u
 ```
 $ curl localhost:8080/ping
 PONG
+```
+
+6. Supprimez le container avec la commande suivante
+
+```
+$ docker rm -f pong
 ```
