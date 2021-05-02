@@ -12,7 +12,7 @@ $ curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/master/contrib/
 
 ## Scanning d'une image
 
-Lancez simplement Trivy sur uee image de votre choix
+Lancez simplement Trivy sur une image de votre choix
 
 ```
 $ trivy IMAGE_NAME
