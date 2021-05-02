@@ -8,7 +8,7 @@ Comme nous l'avons vu, le Dockerfile contient une liste d'instructions qui perm
 
 ## Un serveur http écrit en Go
 
-Prenons l'exemple du programme suivant écrit en Go. 
+Prenons l'exemple du programme suivant écrit en Go.
 
 Dans un nouveau répertoire, créez le fichier *http.go* contenant le code suivant. Celui-ci définit un simple serveur http qui écoute sur le port 8080 et qui expose le endpoint /who en GET. A chaque requête, il renvoie le nom de la machine hôte sur laquelle il tourne.
 
@@ -35,13 +35,13 @@ func main() {
         http.ListenAndServe(":8080", nil)
 }
 ```
- 
+
 ## Dockerfile _traditionel_
 
 Afin de créer une image pour cette application, nous utilisons le Dockerfile suivant. A partir de l'image officielle golang, nous copions le fichier source http.go et lançons la compilation.
 
 Dans le répertoire ou se trouve le fichier *http.go*, créez le fichier *Dockerfile* suivant:
- 
+
 ```
 FROM golang:1.9.0-alpine
 WORKDIR /go/src/github.com/lucj/who
@@ -53,7 +53,7 @@ CMD ["./http"]
 Dans ce *Dockerfile*, nous partons de l'image officielle *golang*. Le fichier source *http.go* est copié puis compilé.
 
 Vous pouvez ensuite builder l'image et la nommer *who:1.0*, avec la commande suivante.
- 
+
 ```
 $ docker image build -t who:1.0 .
 Sending build context to Docker daemon  3.072kB
@@ -78,7 +78,7 @@ Successfully tagged who:1.0
 
 Listez les images présentes. Quelle est la taille de l'image *who:1.0* ?
 
- 
+
 ```
 $ docker image ls who
 REPOSITORY     TAG                 IMAGE ID            CREATED              SIZE
@@ -87,13 +87,13 @@ who            1.0                 1f74e07fd4f7        About a minute ago   276M
 
 L'image obtenue, bien que basée sur une distribution alpine a une taille relativement conséquente (276 MB) car elle contient l'ensemble de la toolchain du langage go. Or, une fois que le binaire a été compilé, nous n'avons plus besoin du compilateur dans l'image finale.
 
- 
+
 ## Dockerfile utilisant un build multi-stage
 
 Le multi-stage build, introduit dans la version 17.05 de Docker permet, au sein d'un seul Dockerfile, d'effectuer le process de build en plusieurs étapes. Chacune des étapes peut réutiliser des artefacts (fichiers résultant de compilation, assets web, ...) créés lors des étapes précédentes. Ce Dockerfile aura plusieurs instructions FROM mais seule la dernière sera utilisée pour la construction de l'image finale.
 
 Si nous reprenons l'exemple du serveur http ci dessus, nous pouvons dans un premier temps compiler le code source en utilisant l'image *golang* contenant le compilateur. Une fois le binaire créé, nous pouvons utiliser une image de base vide, nommée scratch, et copier le binaire généré précédemment. 
- 
+
 ```
 FROM golang:1.9.0-alpine as build
 WORKDIR /go/src/github.com/lucj/who
@@ -104,12 +104,12 @@ FROM scratch
 COPY --from=build /go/src/github.com/lucj/who/http .
 CMD ["./http"]
 ```
- 
+
 > L'exemple que nous avons utilisé ici se base sur une application écrite en Go. ce langage a la particularité de pouvoir être compilé en un binaire static, c'est à dire ne nécessitant pas d'être "linké" à des librairies externes. C'est la raison pour laquelle nous pouvons partir de l'image scratch. Pour d'autres langages, l'image de base utilisée lors de la dernière étape du build pourra être différente (alpine, ...) 
- 
+
 
 Buildez l'image dans sa version 2 avec la commande suivante.
- 
+
 ```
 $ docker image build -t who:2.0 .
 Sending build context to Docker daemon  4.096kB
@@ -135,22 +135,22 @@ Removing intermediate container e2335e16038c
 Successfully built 21f530664efb
 Successfully tagged who:2.0
 ```
- 
+
 Listez les images et observez la différence de taille...
- 
+
 ```
 $ docker image ls who
 REPOSITORY     TAG                 IMAGE ID            CREATED             SIZE
 who            2.0                 21f530664efb        7 minutes ago       6.09MB
 who            1.0                 1f74e07fd4f7        14 minutes ago      276MB
 ```
- 
+
 Lancez un un container basé sur l'image *who:2.0*
- 
+
 ```
 $ docker container run -p 8080:8080 who:2.0  
 ```
- 
+
 A l'aide de la commande curl, envoyez une requête GET sur le endpoint exposé. Vous devriez avoir, en retour, l'identifiant du container qui a traité la requète.
 
 ```
