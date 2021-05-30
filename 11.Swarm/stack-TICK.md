@@ -31,21 +31,21 @@ Créez le fichier *tick.yml* contenant la spécification suivante définissant l
 version: "3.6"
 services:
   telegraf:
-    image: telegraf
+    image: telegraf:1.18-alpine
     configs:
     - source: telegraf-conf
       target: /etc/telegraf/telegraf.conf
     ports:
     - 8186:8186
   influxdb:
-    image: influxdb
+    image: influxdb:1.8-alpine
   chronograf:
-    image: chronograf
+    image: chronograf:1.8-alpine
     ports:
     - 8888:8888
     command: ["chronograf", "--influxdb-url=http://influxdb:8086"]
   kapacitor:
-    image: kapacitor
+    image: kapacitor:1.5-alpine
     environment:
     - KAPACITOR_INFLUXDB_0_URLS_0=http://influxdb:8086
 configs:
