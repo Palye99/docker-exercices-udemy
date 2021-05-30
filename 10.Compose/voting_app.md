@@ -1,26 +1,30 @@
 # Voting application
 
-Dans ce lab, nous allons illustrer l’utilisation de *Docker Compose* et lancer l’application *Voting App* de Docker. Cette application est très utilisée pour des présentations et démos, c'est un bon exemple d'application micro-services simple.
+Dans ce lab, nous allons illustrer l’utilisation de *Docker Compose* et lancer l’application *Voting App*. Cette application est très utilisée pour des présentations et démos, c'est un bon exemple d'application micro-services simple.
 
 ## Vue d’ensemble
 
-L’application *Voting App* est composée de 5 micro-services.
+L’application *Voting App* est composée de plusieurs micro-services, ceux utilisés pour la version 2 sont les suivants:
 
-![Voting App architecture](./images/voting_app_architecture.png)
+![Voting App architecture](./images/architecture-v2.png)
 
-* vote: front-end permettant à un utilisateur de voter entre 2 options
+* vote-ui: front-end permettant à un utilisateur de voter entre 2 options
+* vote: back-end réceptionnant les votes
+* result-ui: front-end permettant de visualiser les résultats
+* result: back-end mettant à disposition les résultats
 * redis: database redis dans laquelle sont stockés les votes
-* worker: service qui récupère les votes depuis redis et met les résultats dans une database postgres
+* worker: service qui récupère les votes depuis redis et consolide les résultats dans une database postgres
 * db: database postgres dans laquelle sont stockés les résultats
-* result: front-end permettant de visualiser les résultats
 
-## Clone du repository GitHub
+##  Récupération des repos GitLab
 
-Avec les commandes ci-dessous, récupérez le code de l’application depuis le repository GitHub.
+Lancez les commandes suivantes afin de récupérer le répo de chaque microservice ainsi que celui de configuration:
 
 ```
-$ git clone https://github.com/docker/example-voting-app    
-$ cd example-voting-app
+mkdir VotingApp && cd VotingApp
+for project in config vote vote-ui result result-ui worker; do
+  git clone https://gitlab.com/voting-application/$project
+done
 ```
 
 ## Installation du binaire docker-compose
@@ -42,53 +46,106 @@ Note: si vous êtes sur Linux et que la commande *docker-compose* est lente, le 
 
 ## Le format de fichier docker-compose.yml
 
-Plusieurs fichiers, au format Docker Compose, sont disponibles dans le repository de la Voting App. Ils décrivent l’application  pour différents environnements et avec différents niveaux de complexité.
+Plusieurs fichiers, au format Docker Compose, sont disponibles dans le répertoire *compose* du repository *config*. Ils décrivent l’application  pour différents environnements.
 
 Nous utilisons ici le fichier *docker-compose.yml* qui est le fichier par défaut.
 
 ```
-version: "3"
 services:
   vote:
-    build: ./vote
+    build: ../../vote
+    # use python rather than gunicorn for local dev
     command: python app.py
+    depends_on:
+      redis:
+        condition: service_healthy
+    ports:
+      - "5002:80"
     volumes:
-     - ./vote:/app
+      - ../../vote:/app
+    networks:
+      - front-tier
+      - back-tier
+
+  vote-ui:
+    build: ../../vote-ui
+    depends_on:
+      vote:
+        condition: service_started
+    volumes:
+      - ../../vote-ui:/usr/share/nginx/html
     ports:
       - "5000:80"
     networks:
       - front-tier
-      - back-tier
+    restart: unless-stopped
+
   result:
-    build: ./result
-    command: nodemon --debug server.js
+    build: ../../result
+    # use nodemon rather than node for local dev
+    command: nodemon server.js
+    depends_on:
+      db:
+        condition: service_healthy
     volumes:
-      - ./result:/app
+      - ../../result:/app
     ports:
-      - "5001:80"
       - "5858:5858"
     networks:
       - front-tier
       - back-tier
+
+  result-ui:
+    build: ../../result-ui
+    depends_on:
+      result:
+        condition: service_started
+    ports:
+      - "5001:80"
+    networks:
+      - front-tier
+    restart: unless-stopped
+
   worker:
-    build: ./worker
+    build:
+      context: ../../worker
+      dockerfile: Dockerfile.${LANGUAGE:-dotnet}
+    depends_on:
+      redis:
+        condition: service_healthy
+      db:
+        condition: service_healthy
     networks:
       - back-tier
+
   redis:
-    image: redis:alpine
-    container_name: redis
-    ports: ["6379"]
+    image: redis:6.2-alpine3.13
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: "5s"
+    ports:
+      - 6379:6379
     networks:
       - back-tier
+
   db:
-    image: postgres:9.4
-    container_name: db
+    image: postgres:13.2-alpine
+    environment:
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "postgres"
     volumes:
       - "db-data:/var/lib/postgresql/data"
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      interval: "5s"
+    ports:
+      - 5432:5432
     networks:
       - back-tier
+
 volumes:
   db-data:
+
 networks:
   front-tier:
   back-tier:
@@ -96,52 +153,21 @@ networks:
 
 Ce fichier est très intéressant car il définit également des volumes et networks en plus des services.
 
-Ce n’est cependant pas un fichier destiné à être lancé en production notamment parce qu'il utilise le code local et non des images releasées pour les services *vote*, *result* et *worker*.
+Ce n’est cependant pas un fichier destiné à être lancé en production notamment parce qu'il utilise le code local et non des images releasées pour les services *vote-ui*, *vote*, *result-ui*, *result* et *worker*.
 
 ## Lancement de l’application
 
-Lancer l’application à partir du fichier *docker-compose.yml* est très simple, il suffit de lancer la commande suivante:
+Depuis le répoertoire *compose*, lancez l’application à partir du fichier *docker-compose.yml* à l'aide de la commande suivante:
 
 ```
 $ docker-compose up -d
 ```
 
-Note: avec l’option -d, l’application est lancée en background.
-
-Vous obtiendrez un résultat similaire à celui ci-dessous (vous n'aurez cependant pas les mêmes identifiants)
-
-```
-Creating network "examplevotingapp_front-tier" with the default driver
-Creating network "examplevotingapp_back-tier" with the default driver
-Creating volume "examplevotingapp_db-data" with default driver
-Building vote
-...
-Successfully built 132dbb3a7da7
-WARNING: Image for service vote was built because it did not already exist. To rebuild this image you must use `docker-compose build` or `docker-compose up --build`.
-Building worker
-...
-Successfully built 1fd182d05dc0
-WARNING: Image for service worker was built because it did not already exist. To rebuild this image you must use `docker-compose build` or `docker-compose up --build`.
-Pulling redis (redis:alpine)...
-Status: Downloaded newer image for redis:alpine
-Pulling db (postgres:9.4)...
-Status: Downloaded newer image for postgres:9.4
-Building result
-...
-Successfully built b83b544a167c
-WARNING: Image for service result was built because it did not already exist. To rebuild this image you must use `docker-compose build` or `docker-compose up --build`.
-Creating examplevotingapp_result_1
-Creating examplevotingapp_worker_1
-Creating examplevotingapp_vote_1
-Creating redis
-Creating db
-```
-
 Les étapes réalisées lors du lancement de l’application sont les suivantes:
-* création du volume
-* création des networks
-* construction des images pour les services *vote*, *worker* et *result* et récupération des images *redis* et *postgres*
-* lancement de containers pour chaque service
+* création des networks front-tier et back-tier
+* création du volume db-data
+* construction des images pour les services *vote-ui*, *vote*, *result-ui*, *result*, *worker* et récupération des images *redis* et *postgres*
+* lancement des containers pour chaque service
 
 ## Les containers lancés
 
@@ -149,13 +175,15 @@ Avec la commande suivante, listez les containers qui ont été lancés.
 
 ```
 $ docker-compose ps
-          Name                         Command               State                      Ports
------------------------------------------------------------------------------------------------------------------
-db                          docker-entrypoint.sh postgres    Up      5432/tcp
-examplevotingapp_result_1   nodemon --debug server.js        Up      0.0.0.0:5858->5858/tcp, 0.0.0.0:5001->80/tcp
-examplevotingapp_vote_1     python app.py                    Up      0.0.0.0:5000->80/tcp
-examplevotingapp_worker_1   /bin/sh -c dotnet src/Work ...   Up
-redis                       docker-entrypoint.sh redis ...   Up      0.0.0.0:32768->6379/tcp
+       Name                      Command                  State                            Ports
+----------------------------------------------------------------------------------------------------------------------
+compose_db_1          docker-entrypoint.sh postgres    Up (healthy)   0.0.0.0:5432->5432/tcp,:::5432->5432/tcp
+compose_redis_1       docker-entrypoint.sh redis ...   Up (healthy)   0.0.0.0:6379->6379/tcp,:::6379->6379/tcp
+compose_result-ui_1   /docker-entrypoint.sh ngin ...   Up             0.0.0.0:5001->80/tcp,:::5001->80/tcp
+compose_result_1      docker-entrypoint.sh nodem ...   Up             0.0.0.0:5858->5858/tcp,:::5858->5858/tcp, 80/tcp
+compose_vote-ui_1     /docker-entrypoint.sh ngin ...   Up             0.0.0.0:5000->80/tcp,:::5000->80/tcp
+compose_vote_1        python app.py                    Up             0.0.0.0:5002->80/tcp,:::5002->80/tcp
+compose_worker_1      dotnet Worker.dll                Up
 ```
 
 ## Les volumes créés
@@ -169,8 +197,8 @@ $ docker volume ls
 Le nom du volume est prefixé par le nom du répertoire dans lequel l’application a été lancée.
 
 ```
-DRIVER              VOLUME NAME
-local               examplevotingapp_db-data
+DRIVER    VOLUME NAME
+local     compose_db-data
 ```
 
 Par défaut ce volume correspond à un répertoire créé sur la machine hôte.
@@ -186,12 +214,12 @@ $ docker network ls
 De même que pour le volume, leur nom est préfixé par le nom du répertoire.
 
 ```
-NETWORK ID          NAME                          DRIVER              SCOPE
-38b004826b88        bridge                        bridge              local
-07e7d2fca1bf        examplevotingapp_back-tier    bridge              local
-ed12232eead5        examplevotingapp_front-tier   bridge              local
-cfb848586437        host                          host                local
-42843cd0d2cf        none                          null                local
+NETWORK ID     NAME                 DRIVER    SCOPE
+71d0f64882d5   bridge               bridge    local
+409bc6998857   compose_back-tier    bridge    local
+b3858656638b   compose_front-tier   bridge    local
+2f00536eb085   host                 host      local
+54dee0283ab4   none                 null      local
 ```
 
 Note: comme nous sommes dans le contexte d’un hôte unique (et non dans le contexte d’un cluster Swarm), le driver utilisé pour la création de ces networks est du type bridge. Il permet la communication entre les containers tournant sur une même machine.
@@ -218,39 +246,37 @@ Avec la commande suivante, augmenter le nombre de worker à 2.
 
 ```
 $ docker-compose up -d --scale worker=2
-Starting examplevotingapp_worker_1 ... done
-Creating examplevotingapp_worker_2 ...
-Creating examplevotingapp_worker_2 ... done
+compose_db_1 is up-to-date
+compose_redis_1 is up-to-date
+compose_result_1 is up-to-date
+compose_vote_1 is up-to-date
+compose_result-ui_1 is up-to-date
+compose_vote-ui_1 is up-to-date
+Creating compose_worker_2 ... done
 ```
 
 Les 2 containers relatifs au service *worker* sont présents:
 
 ```
 $ docker-compose ps
-          Name                         Command                State                        Ports
---------------------------------------------------------------------------------------------------------------------
-db                          docker-entrypoint.sh postgres    Up         5432/tcp
-examplevotingapp_result_1   nodemon --debug server.js        Up         0.0.0.0:5858->5858/tcp, 0.0.0.0:5001->80/tcp
-examplevotingapp_vote_1     python app.py                    Up         0.0.0.0:5000->80/tcp
-examplevotingapp_worker_1   /bin/sh -c dotnet src/Work ...   Up
-examplevotingapp_worker_2   /bin/sh -c dotnet src/Work ...   Up
-redis                       docker-entrypoint.sh redis ...   Up         0.0.0.0:32768->6379/tcp
+       Name                      Command                  State                            Ports
+----------------------------------------------------------------------------------------------------------------------
+compose_db_1          docker-entrypoint.sh postgres    Up (healthy)   0.0.0.0:5432->5432/tcp,:::5432->5432/tcp
+compose_redis_1       docker-entrypoint.sh redis ...   Up (healthy)   0.0.0.0:6379->6379/tcp,:::6379->6379/tcp
+compose_result-ui_1   /docker-entrypoint.sh ngin ...   Up             0.0.0.0:5001->80/tcp,:::5001->80/tcp
+compose_result_1      docker-entrypoint.sh nodem ...   Up             0.0.0.0:5858->5858/tcp,:::5858->5858/tcp, 80/tcp
+compose_vote-ui_1     /docker-entrypoint.sh ngin ...   Up             0.0.0.0:5000->80/tcp,:::5000->80/tcp
+compose_vote_1        python app.py                    Up             0.0.0.0:5002->80/tcp,:::5002->80/tcp
+compose_worker_1      dotnet Worker.dll                Up
+compose_worker_2      dotnet Worker.dll                Up
 ```
 
-Notes:
-* il n’est pas possible de scaler les services *vote* et *result* car ils spécifient tous les 2 un port, plusieurs containers ne peuvent pas utiliser le même port de la machine hôte
-* il n’est pas non plus possible de scaler les services *db* et *redis* car ils spécifient tous les 2 l’option *container_name*, plusieurs containers ne peuvent pas avoir le même nom.
+Notes: il n’est pas possible de scaler les services *vote-ui* et *result-ui* car ils spécifient tous les 2 un port, plusieurs containers ne peuvent pas utiliser le même port de la machine hôte
 
 ```
-$ docker-compose up -d --scale vote=3
+$ docker-compose up -d --scale vote-ui=3
 ...
-ERROR: for examplevotingapp_vote_3  Cannot start service vote: driver failed programming external connectivity on endpoint examplevotingapp_vote_3 (b520da97c5736c46bfb2c80947fd2643387df0e0f67bbe18c226bad006dc940e): Bind for 0.0.0.0:5000 failed: port is already allocated
-```
-
-```
-docker-compose up -d --scale redis=2
-...
-ERROR: for redis  Cannot create container for service redis: Conflict. The container name "/redis" is already in use by container "ff7ffbbebc3f4441a6b93c9a06389367b552b010bd62377931372ec2da0d4d59". You have to remove (or rename) that container to be able to reuse that name.
+ERROR: for vote-ui  Cannot start service vote-ui: driver failed programming external connectivity on endpoint compose_vote-ui_2 (6274094570a329e3a4d9bdcdf4d31b7e3a8e3e7e78d3cc362ad56e14341913da): Bind for 0.0.0.0:5000 failed: port is already allocated
 ```
 
 ## Suppression de l’application
@@ -259,18 +285,24 @@ Avec la commande suivante, stoppez l’application. Cette commande supprime l’
 
 ```
 $ docker-compose down
-Stopping examplevotingapp_vote_1 ... done
-Stopping redis ... done
-Stopping db ... done
-Stopping examplevotingapp_worker_1 ... done
-Stopping examplevotingapp_result_1 ... done
-Removing examplevotingapp_vote_1 ... done
-Removing redis ... done
-Removing db ... done
-Removing examplevotingapp_worker_1 ... done
-Removing examplevotingapp_result_1 ... done
-Removing network examplevotingapp_front-tier
-Removing network examplevotingapp_back-tier
+Stopping compose_result-ui_1 ... done
+Stopping compose_vote-ui_1   ... done
+Stopping compose_result_1    ... done
+Stopping compose_vote_1      ... done
+Stopping compose_worker_1    ... done
+Stopping compose_redis_1     ... done
+Stopping compose_db_1        ... done
+Removing compose_vote-ui_3   ... done
+Removing compose_vote-ui_2   ... done
+Removing compose_result-ui_1 ... done
+Removing compose_vote-ui_1   ... done
+Removing compose_result_1    ... done
+Removing compose_vote_1      ... done
+Removing compose_worker_1    ... done
+Removing compose_redis_1     ... done
+Removing compose_db_1        ... done
+Removing network compose_back-tier
+Removing network compose_front-tier
 ```
 
 Afin de supprimer également les volumes utilisés, il faut ajouter le flag *-v*:
@@ -283,6 +315,6 @@ $ docker-compose down -v
 
 Cet exemple illustre l’utilisation de *Docker Compose* sur l’exemple bien connu de la Voting App dans le cadre d’un hôte unique. Pour déployer cette application sur un environnement de production, il faudrait effectuer des modifications dans le fichier docker-compose, par exemple:
 * utilisation d’images pour les services
-* ajout de service supplémentaires (aggr&gateur de logs, terminaison ssl, …)
+* ajout de service supplémentaires (aggrégateur de logs, terminaison ssl, ...)
 * contraintes de déploiement
 * ...
