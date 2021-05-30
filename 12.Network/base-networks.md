@@ -2,7 +2,9 @@
 
 Dans cette mise en pratique, nous allons étudier la mise en réseau des containers Docker. Nous verrons notamment les networks qui sont crées par défaut lors de l’installation de la plateforme et nous passerons en revue différents drivers qui sont disponibles avec une installation standard.
 
-## Création d'un hôte Docker
+## Pré-requis: création d'un hôte Docker
+
+:fire: si vous avez déjà accès à une machine avec Docker, vous pouvez passer à l'étape suivante (1) directement.
 
 Pour faire simple, nous allons créer un hôte Docker dans VirtualBox avec Vagrant. Cet hôte sera basé sur une machine virtuelles Ubuntu Bionic64.
 
