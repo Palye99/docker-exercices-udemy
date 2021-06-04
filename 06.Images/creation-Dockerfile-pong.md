@@ -2,10 +2,11 @@
 
 ## Enoncé
 
-1. Développez (ou prenez l'exemple développé en Node.js de la correction :) ) un serveur HTTP qui expose le endpoint */ping* sur le port 80 et répond par PONG.
+1. Créer un nouveau répertoire et développez un serveur HTTP qui expose le endpoint */ping* sur le port 80 et répond par PONG.
 
+:fire: pour gagner du temps, vous pouvez utiliser l'exemple développé en Node.js de la correction :)
 
-2. Créez le fichier Dockerfile qui servira à construire l'image de l'application. Ce fichier devra décrire les actions suivantes
+2. Dans le même répertoire, créez le fichier Dockerfile qui servira à construire l'image de l'application. Ce fichier devra décrire les actions suivantes
 
 - image de base: alpine:3.10
 - installation du runtime du langage choisi

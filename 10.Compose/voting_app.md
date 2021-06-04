@@ -48,7 +48,7 @@ Note: si vous êtes sur Linux et que la commande *docker-compose* est lente, le 
 
 Plusieurs fichiers, au format Docker Compose, sont disponibles dans le répertoire *compose* du repository *config*. Ils décrivent l’application  pour différents environnements.
 
-Nous utilisons ici le fichier *docker-compose.yml* qui est le fichier par défaut.
+Nous utilisons le fichier *docker-compose.yml* qui est le fichier par défaut.
 
 ```
 services:
@@ -153,11 +153,11 @@ networks:
 
 Ce fichier est très intéressant car il définit également des volumes et networks en plus des services.
 
-Ce n’est cependant pas un fichier destiné à être lancé en production notamment parce qu'il utilise le code local et non des images releasées pour les services *vote-ui*, *vote*, *result-ui*, *result* et *worker*.
+Ce n’est cependant pas un fichier destiné à être lancé en production notamment parce qu'il utilise le code local et ne fait pas référence à des images existantes pour les services *vote-ui*, *vote*, *result-ui*, *result* et *worker*.
 
 ## Lancement de l’application
 
-Depuis le répoertoire *compose*, lancez l’application à partir du fichier *docker-compose.yml* à l'aide de la commande suivante:
+Depuis le répertoire *compose* du répo *config*, lancez l’application à partir du fichier *docker-compose.yml* à l'aide de la commande suivante:
 
 ```
 $ docker-compose up -d
