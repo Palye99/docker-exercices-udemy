@@ -417,3 +417,64 @@ Sortez du container **c2** et supprimez c1 et c2.
 # exit
 $ docker rm -f c1 c2
 ```
+
+## 4. Macvlan network
+
+Un network de type macvlan donne à chaque container un accès direct à une interface de la machine hôte, lui permettant ainsi d’être attaché à l’infrastructure réseau existante. Les containers sont adressés par une adresse IP routable sur un sous réseau du réseau externe.
+
+![Macvlan](./images/net-macvlan.png)
+
+Un network de type macvlan peut être créé avec la commande docker network create en spécifiant l’option **-–driver=macvlan**.
+
+Créez un network de type **macvlan**, nommé **mvnet** avec la commande suivante:
+
+Note: positionnez au préalable la variable **INTERFACE** avec le nom de l'interface de la machine hôte qui a une IP sur le range **192.168.33.0/24** (enp0s8 dans cet exemple)
+
+```
+INTERFACE=enp0s8
+$ docker network create -d macvlan --subnet 192.168.33.0/24 --gateway 192.168.33.1 -o parent=$INTERFACE.10 mvnet
+```
+
+Nous créons ensuite 2 containers attachés à ce network, nous spécifions les IP sur le sous réseau utilisé.
+
+```
+$ docker container run -d --name c1 --network mvnet --ip 192.168.33.11 alpine:3.8 sleep 10000
+$ docker container run -it --name c2 --network mvnet --ip 192.168.33.12 alpine:3.8 sh
+```
+
+Depuis le container c2 nous pouvons communiquer avec le container c1 via son adresse IP ou son nom grace à au serveur DNS interne au daemon Docker.
+
+Utilisation de l'adresse IP de **c1**:
+```
+# ping -c 3 192.168.33.11
+PING 192.168.33.11 (192.168.33.11): 56 data bytes
+64 bytes from 192.168.33.11: seq=0 ttl=64 time=0.054 ms
+64 bytes from 192.168.33.11: seq=1 ttl=64 time=0.076 ms
+64 bytes from 192.168.33.11: seq=2 ttl=64 time=0.066 ms
+
+--- 192.168.33.11 ping statistics ---
+3 packets transmitted, 3 packets received, 0% packet loss
+round-trip min/avg/max = 0.054/0.065/0.076 ms
+```
+
+Utilisation du nom **c1**:
+```
+# ping -c 3 c1
+PING c1 (192.168.33.11): 56 data bytes
+64 bytes from 192.168.33.11: seq=0 ttl=64 time=0.042 ms
+64 bytes from 192.168.33.11: seq=1 ttl=64 time=0.066 ms
+64 bytes from 192.168.33.11: seq=2 ttl=64 time=0.064 ms
+
+--- c1 ping statistics ---
+3 packets transmitted, 3 packets received, 0% packet loss
+round-trip min/avg/max = 0.042/0.057/0.066 ms
+```
+
+Un network de type macvlan a un scope local, il est souvent utilisé pour des besoins de performances car il n’y a pas de bridge intermédiaire. Il est également utilisé pour faciliter la migration d’applications vers Docker en l’attachant à une infrastructure sous jacente existante.
+
+Nous pouvons alors sortir du container, et supprimer c1 et c2.
+
+```
+# exit
+$ docker rm -f c1 c2
+```
