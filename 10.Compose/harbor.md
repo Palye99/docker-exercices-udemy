@@ -17,7 +17,6 @@ Harbor est déployé en tant qu'application micro-services composée de:
 
 - Postgresql
 - Redis
-- Clair
 - Chartmuseum
 - Docker/distribution
 - Docker/notary
@@ -42,7 +41,7 @@ Note: si vous êtes sur Linux et que la commande *docker-compose* est lente, le 
 La première étape consiste à télécharger la dernière version de Harbor:
 
 ```
-$ curl -L https://github.com/goharbor/harbor/releases/download/v2.1.0/harbor-online-installer-v2.1.0.tgz -o harbor.tgz
+$ curl -L https://github.com/goharbor/harbor/releases/download/v2.3.2/harbor-online-installer-v2.3.2.tgz -o harbor.tgz
 $ tar xvf harbor.tgz
 ```
 
@@ -56,7 +55,7 @@ $ cp harbor.yml.tmpl harbor.yml
 
 Ensuite, modifiez le contenu de ce fichier, il vous faudra:
 
-- spécifier le *hostname* (vous utiliserez pour cela un domain en `xip.io`)
+- spécifier le *hostname* (vous utiliserez pour cela un domain en `nip.io`)
 - mettre en commentaire la configuration https
 
 Le début du fichier *harbor.yml* devrait ressembler à celui ci-dessous (assurez-vous de remplacer HOST_IP par l'adresse IP de la machine sur laquelle vous installez Harbor):
@@ -64,7 +63,7 @@ Le début du fichier *harbor.yml* devrait ressembler à celui ci-dessous (assure
 ```
 # The IP address or hostname to access admin UI and registry service.
 # DO NOT use localhost or 127.0.0.1, because Harbor needs to be accessed by external clients.
-hostname: HOST_IP.xip.io
+hostname: HOST_IP.nip.io
 
 # http related config
 http:
@@ -87,40 +86,37 @@ Note: la configuration https a été mise en commentaire car nous exposerons Har
 
 Plusieurs options sont disponible lors de l'installation de Harbor:
 
-- --with-notary: Notary permet la création et la vérification de signatures sur les images
-- --with-clair: Clair est un scanner de vulnérabilités permettant de détecter des CVE
+- --with-notary: Notary permet la création et la vérification de signatures sur les images (nécessite la configuration TLS)
 - --with-trivy: Trivy est également un scanner de vulnérabilités
 - --with-chartmuseum: ChartMuseum permet de distribuer des application packagées dans des charts Helm (utilisé dans le monde Kubernetes)
 
-Dans cet exemple, vous allez installer Harbor avec Trivy, Clair et ChartMuseum:
+Dans cet exemple, vous allez installer Harbor avec Trivy et ChartMuseum:
 ```
-$ sudo ./install.sh --with-trivy --with-clair --with-chartmuseum
+$ sudo ./install.sh --with-trivy --with-chartmuseum
 ```
 
 En utilisant le binaire *docker-compose*, vérifiez que les différents composants ont été déployés. Vous devriez obtenir un résultat proche de celui ci-dessous.
 
 ```
 $ docker-compose ps
-Name                     Command                  State                 Ports
----------------------------------------------------------------------------------------------
-chartmuseum         ./docker-entrypoint.sh           Up (healthy)
-clair               ./docker-entrypoint.sh           Up (healthy)
-clair-adapter       /home/clair-adapter/entryp ...   Up (healthy)
-harbor-core         /harbor/entrypoint.sh            Up (healthy)
-harbor-db           /docker-entrypoint.sh            Up (healthy)
-harbor-jobservice   /harbor/entrypoint.sh            Up (healthy)
-harbor-log          /bin/sh -c /usr/local/bin/ ...   Up (healthy)   127.0.0.1:1514->10514/tcp
-harbor-portal       nginx -g daemon off;             Up (healthy)
-nginx               nginx -g daemon off;             Up (healthy)   0.0.0.0:80->8080/tcp
-redis               redis-server /etc/redis.conf     Up (healthy)
-registry            /home/harbor/entrypoint.sh       Up (healthy)
-registryctl         /home/harbor/start.sh            Up (healthy)
-trivy-adapter       /home/scanner/entrypoint.sh      Up (healthy)
+      Name                     Command                       State                          Ports
+-----------------------------------------------------------------------------------------------------------------
+chartmuseum         ./docker-entrypoint.sh           Up (health: starting)
+harbor-core         /harbor/entrypoint.sh            Up (health: starting)
+harbor-db           /docker-entrypoint.sh 96 13      Up (health: starting)
+harbor-jobservice   /harbor/entrypoint.sh            Up (health: starting)
+harbor-log          /bin/sh -c /usr/local/bin/ ...   Up (health: starting)   127.0.0.1:1514->10514/tcp
+harbor-portal       nginx -g daemon off;             Up (health: starting)
+nginx               nginx -g daemon off;             Up (health: starting)   0.0.0.0:80->8080/tcp,:::80->8080/tcp
+redis               redis-server /etc/redis.conf     Up (health: starting)
+registry            /home/harbor/entrypoint.sh       Up (health: starting)
+registryctl         /home/harbor/start.sh            Up (health: starting)
+trivy-adapter       /home/scanner/entrypoint.sh      Up (health: starting)
 ```
 
 ## Accès à l'interface
 
-L'interface est maintenant accessible depuis http://HOST_IP.xip.io
+L'interface est maintenant accessible depuis http://HOST_IP.nip.io
 
 Note: vous devrez remplacer HOST_IP par l'adresse IP de la machine sur laquelle vous installez Harbor
 
@@ -151,7 +147,7 @@ Pour que notre daemon Docker puisse accéder à ce registry (notamment pour y pu
 
 ```
 {
-  "insecure-registries": ["HOST_IP.xip.io"]
+  "insecure-registries": ["HOST_IP.nip.io"]
 }
 ```
 
@@ -165,7 +161,7 @@ $ sudo systemctl restart docker
 Vous devriez alors pouvoir vous logger sur le registry que vous avez mis en place.
 
 ```
-$ docker login -u admin HOST_IP.xip.io
+$ docker login -u admin HOST_IP.nip.io
 Username: admin
 Password:
 ...
@@ -176,22 +172,22 @@ Login Succeeded
 
 Vous allez à présent envoyer une image sur le registry. Pour ce faire, vous pouvez utiliser une image que vous avez déjà en local ou bien récupérer une image depuis le Docker Hub. Il faudra ensuite la tagger de façon à lui donner un nom qui permettra de l'envoyer dans un Dépot du projet *demo*.
 
-En utilisant les commandes suivantes, récupèrez l'image *nginx:1.16* puis taggez la de façon à ce qu'elle puisse être envoyée dans le dépot *www* du projet *demo*.
+En utilisant les commandes suivantes, récupèrez l'image *nginx:1.18* puis taggez la de façon à ce qu'elle puisse être envoyée dans le dépot *www* du projet *demo*.
 
 ```
-$ docker pull nginx:1.16
-$ docker image tag nginx:1.16 HOST_IP.xip.io/demo/www:1.0
+$ docker pull nginx:1.18
+$ docker image tag nginx:1.18 HOST_IP.nip.io/demo/www:1.0
 ```
 
 Vous pouvez ensuite envoyer l'image dans Harbor avec la commande suivante:
 
 ```
-$ docker image push HOST_IP.xip.io
+$ docker image push HOST_IP.nip.io
 ```
 
 Vous obtiendrez un résultat proche de celui ci-dessous:
 ```
-The push refers to repository [HOST_IP.xip.io/demo/www]
+The push refers to repository [HOST_IP.nip.io/demo/www]
 c23548ea0b99: Pushed
 82068c842707: Pushed
 c2adabaecedb: Pushed
@@ -211,8 +207,6 @@ Sélectionnez ensuite l'image et lancez un scanning de vulnérabilités en cliqu
 ![Harbor](./images/harbor-7.png)
 
 ![Harbor](./images/harbor-8.png)
-
-Note: par défaut le scanner utilisé est *Clair*, il est cependant possible d'utiliser *Trivy* à la place, les 2 scanners ayant été déployés lors que vous avez installé Harbor.
 
 Il est important de savoir si une image contient des vulnérabilités, mais il est parfois difficile de savoir si cette image peut être utilisée dans une application. Cela dépend notamment de plusieurs facteurs: est ce que l'application est exposée au monde extérieur ou exécutée uniquement en interne, est ce que la vulnérabilité peut-elle être facilement exploitée, ... ?
 

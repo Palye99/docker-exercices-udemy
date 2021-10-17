@@ -188,15 +188,15 @@ Est ce que tous les containers que vous avez créés sont listés ?
 
 Note: la seconde commande est historique et date de l'époque ou la plateforme Docker était principalement utilisée pour la gestion des containers et des images. Par la suite, d'autres primitives que nous verrons dans les prochains chapitres ont été ajoutées (volume, network, node, ...), ce qui a conduit à une refactorisation de l'api disponible en ligne de commande.
 
-2. Seuls les containers en cours d'execution sont listés. Les containers qui ont été créés puis arrêtés ne sont pas visible dans la sortie de cette commande.
+Seuls les containers en cours d'execution sont listés. Les containers qui ont été créés puis arrêtés ne sont pas visible dans la sortie de cette commande.
 
-3. Les commandes suivantes permettent de lister les containers en cours d'execution ainsi que ceux qui sont stoppés.
+2. Les commandes suivantes permettent de lister les containers en cours d'execution ainsi que ceux qui sont stoppés.
 
 ```
 docker container ls -a  et docker ps -a
 ```
 
-4. Les commandes suivantes permettent de lister les identifiants de l'ensemble des containers tournant sur la machine hôte, ceux en cours d'execution et également ceux qui ont été stoppés.
+3. Les commandes suivantes permettent de lister les identifiants de l'ensemble des containers tournant sur la machine hôte, ceux en cours d'execution et également ceux qui ont été stoppés.
 
 - ```docker container ls -aq```
 - ```docker ps -aq```

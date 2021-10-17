@@ -10,7 +10,7 @@ Comme nous l'avons vu, le Dockerfile contient une liste d'instructions qui perm
 
 Prenons l'exemple du programme suivant écrit en Go.
 
-Dans un nouveau répertoire, créez le fichier *http.go* contenant le code suivant. Celui-ci définit un simple serveur http qui écoute sur le port 8080 et qui expose le endpoint /who en GET. A chaque requête, il renvoie le nom de la machine hôte sur laquelle il tourne.
+Dans un nouveau répertoire, créez le fichier *http.go* contenant le code suivant. Celui-ci définit un simple serveur http qui écoute sur le port 8080 et qui expose le endpoint /whoami en GET. A chaque requête, il renvoie le nom de la machine hôte sur laquelle il tourne.
 
 ```
 package main
@@ -31,61 +31,42 @@ func handler(w http.ResponseWriter, req *http.Request) {
 }
 
 func main() {
-        http.HandleFunc("/who", handler)
+        http.HandleFunc("/whoami", handler)
         http.ListenAndServe(":8080", nil)
 }
 ```
 
 ## Dockerfile _traditionel_
 
-Afin de créer une image pour cette application, nous utilisons le Dockerfile suivant. A partir de l'image officielle golang, nous copions le fichier source http.go et lançons la compilation.
-
-Dans le répertoire ou se trouve le fichier *http.go*, créez le fichier *Dockerfile* suivant:
+Afin de créer une image pour cette application, créez tout dabord le fichier Dockerfile avec le contenu suivant (placez ce fichier dans le même répertoire que *http.go*):
 
 ```
-FROM golang:1.9.0-alpine
-WORKDIR /go/src/github.com/lucj/who
+FROM golang:1.17
+WORKDIR /go/src/app
 COPY http.go .
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o http .
+RUN go mod init
+RUN CGO_ENABLED=0 GOOS=linux go build -o http .
 CMD ["./http"]
 ```
 
-Dans ce *Dockerfile*, nous partons de l'image officielle *golang*. Le fichier source *http.go* est copié puis compilé.
+Note: dans ce *Dockerfile*, l'image officielle *golang* est utilisée comme image de base,  le fichier source *http.go* est copié puis compilé.
 
-Vous pouvez ensuite builder l'image et la nommer *who:1.0*, avec la commande suivante.
+Vous pouvez ensuite builder l'image et la nommer *whoami:1.0*:.
 
 ```
-$ docker image build -t who:1.0 .
-Sending build context to Docker daemon  3.072kB
-Step 1/5 : FROM golang:1.9.0-alpine
- ---> ed119d8f7db5
-Step 2/5 : WORKDIR /go/src/github.com/lucj/who
- ---> c12f059e10cd
-Removing intermediate container 79f6f35b2c49
-Step 3/5 : COPY http.go .
- ---> c14acda96ae7
-Step 4/5 : RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o http .
- ---> Running in 86b538167121
- ---> b0319625972d
-Removing intermediate container 86b538167121
-Step 5/5 : CMD ./http
- ---> Running in 88ae1b957b46
- ---> 1f74e07fd4f7
-Removing intermediate container 88ae1b957b46
-Successfully built 1f74e07fd4f7
-Successfully tagged who:1.0
+$ docker image build -t whoami:1.0 .
 ```
 
-Listez les images présentes. Quelle est la taille de l'image *who:1.0* ?
+Listez les images présentes et notez la taille de l'image *whoami:1.0*
 
 
 ```
-$ docker image ls who
-REPOSITORY     TAG                 IMAGE ID            CREATED              SIZE
-who            1.0                 1f74e07fd4f7        About a minute ago   276MB
+$ docker image ls whoami
+REPOSITORY   TAG       IMAGE ID       CREATED         SIZE
+whoami       1.0       16795cf36deb   2 seconds ago   962MB
 ```
 
-L'image obtenue, bien que basée sur une distribution alpine a une taille relativement conséquente (276 MB) car elle contient l'ensemble de la toolchain du langage go. Or, une fois que le binaire a été compilé, nous n'avons plus besoin du compilateur dans l'image finale.
+L'image obtenue a une taille très conséquente car elle contient l'ensemble de la toolchain du langage Go. Or, une fois que le binaire a été compilé, nous n'avons plus besoin du compilateur dans l'image finale.
 
 
 ## Dockerfile utilisant un build multi-stage
@@ -94,14 +75,17 @@ Le multi-stage build, introduit dans la version 17.05 de Docker permet, au sein 
 
 Si nous reprenons l'exemple du serveur http ci dessus, nous pouvons dans un premier temps compiler le code source en utilisant l'image *golang* contenant le compilateur. Une fois le binaire créé, nous pouvons utiliser une image de base vide, nommée scratch, et copier le binaire généré précédemment. 
 
+Remplacer le contenu du fichier Dockerfile avec les instructions suivantes:
+
 ```
-FROM golang:1.9.0-alpine as build
-WORKDIR /go/src/github.com/lucj/who
+FROM golang:1.17 as build
+WORKDIR /go/src/app
 COPY http.go .
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o http .
+RUN go mod init
+RUN CGO_ENABLED=0 GOOS=linux go build -o http .
 
 FROM scratch
-COPY --from=build /go/src/github.com/lucj/who/http .
+COPY --from=build /go/src/app .
 CMD ["./http"]
 ```
 
@@ -111,51 +95,29 @@ CMD ["./http"]
 Buildez l'image dans sa version 2 avec la commande suivante.
 
 ```
-$ docker image build -t who:2.0 .
-Sending build context to Docker daemon  4.096kB
-Step 1/7 : FROM golang:1.9.0-alpine as build
- ---> ed119d8f7db5
-Step 2/7 : WORKDIR /go/src/github.com/lucj/who
- ---> 5bbf49c30ad7
-Removing intermediate container 9b3ac039f5e3
-Step 3/7 : COPY http.go .
- ---> 28b995cce8c9
-Step 4/7 : RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o http .
- ---> Running in ec39fa26ddb2
- ---> 94f190c3d0d9
-Removing intermediate container ec39fa26ddb2
-Step 5/7 : FROM scratch
- --->
-Step 6/7 : COPY --from=build /go/src/github.com/lucj/who/http .
- ---> 370634625fc4
-Step 7/7 : CMD ./http
- ---> Running in e2335e16038c
- ---> 21f530664efb
-Removing intermediate container e2335e16038c
-Successfully built 21f530664efb
-Successfully tagged who:2.0
+$ docker image build -t whoami:2.0 .
 ```
 
-Listez les images et observez la différence de taille...
+Listez les images et observez la différence de taille entre celles-ci:
 
 ```
-$ docker image ls who
-REPOSITORY     TAG                 IMAGE ID            CREATED             SIZE
-who            2.0                 21f530664efb        7 minutes ago       6.09MB
-who            1.0                 1f74e07fd4f7        14 minutes ago      276MB
+$ docker image ls whoami
+REPOSITORY   TAG       IMAGE ID       CREATED         SIZE
+whoami       2.0       0a97315aeaaa   6 seconds ago   6.07MB
+whoami       1.0       16795cf36deb   2 minutes ago   962MB
 ```
 
-Lancez un un container basé sur l'image *who:2.0*
+Lancez un container basé sur l'image *whoami:2.0*
 
 ```
-$ docker container run -p 8080:8080 who:2.0  
+$ docker container run -p 8080:8080 whoami:2.0
 ```
 
 A l'aide de la commande curl, envoyez une requête GET sur le endpoint exposé. Vous devriez avoir, en retour, l'identifiant du container qui a traité la requète.
 
 ```
-$ curl localhost:8080/who
+$ curl localhost:8080/whoami
 7562306c6c5e
 ```
 
-Pour cette simple application, le multistage build a permit de supprimer 270M de binaires et librairies dont la présence est inutile dans l'image finale. L'exemple d'une application écrite en **go** est extrème, mais le multistage build fait partie des bonnes pratiques à adopter quel que soit le language de développement de l'application.
+Pour cette simple application, le multistage build a permit de supprimer les binaires et librairies dont la présence est inutile dans l'image finale. L'exemple d'une application écrite en **go** est extrème, mais le multistage build fait partie des bonnes pratiques à adopter pour de nombreux languages de développement.

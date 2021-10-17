@@ -17,10 +17,10 @@ Dans un Dockerfile, les instructions ENTRYPOINT et CMD peuvent être spécifiée
 ENTRYPOINT et CMD sont 2 instructions du Dockerfile, mais elle peuvent cependant être écrasées au lancement d’un container:
 
 * pour spécifier une autre valeur pour l’ENTRYPOINT, on utilisera l’option --entrypoint, par exemple:
-`docker container run --entrypoint echo alpine`
+`docker container run --entrypoint echo alpine hello`
 
 * pour spécifier une autre valeur pour CMD, on précisera celle-ci après le nom de l’image, par exemple:
-`docker container run alpine echo "hello"`
+`docker container run alpine echo hello`
 
 ## Instruction ENTRYPOINT utilisée seule
 

@@ -29,7 +29,7 @@ done
 
 ## Installation du binaire docker-compose
 
-:fire: si vous êtes sur Linux, n'installez pas *docker-compose* avec *apt-get*, vous auriez une version trop ancienne
+:fire: :fire: :fire: si vous êtes sur Linux, n'installez pas *docker-compose* avec *apt-get*, vous auriez une version trop ancienne
 
 - si vous utilisez *Docker for Mac* ou *Docker for Windows*, le binaire *docker-compose* est déjà installé
 
@@ -46,9 +46,9 @@ Note: si vous êtes sur Linux et que la commande *docker-compose* est lente, le 
 
 ## Le format de fichier docker-compose.yml
 
-Plusieurs fichiers, au format Docker Compose, sont disponibles dans le répertoire *compose* du repository *config*. Ils décrivent l’application  pour différents environnements.
+Plusieurs fichiers, au format Docker Compose, sont disponibles dans *config/compose*. Ils décrivent l’application  pour différents environnements.
 
-Nous utilisons le fichier *docker-compose.yml* qui est le fichier par défaut.
+Le fichier qui sera utilisé par défaut est le fichier *docker-compose.yml* dont le contenu est le suivant:
 
 ```
 services:
@@ -157,7 +157,7 @@ Ce n’est cependant pas un fichier destiné à être lancé en production notam
 
 ## Lancement de l’application
 
-Depuis le répertoire *compose* du répo *config*, lancez l’application à partir du fichier *docker-compose.yml* à l'aide de la commande suivante:
+Depuis le répertoire *config/compose*, lancez l’application à l'aide de la commande suivante (le fichier *docker-compose.yml* sera utilisé par défaut):
 
 ```
 $ docker-compose up -d
