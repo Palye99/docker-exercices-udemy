@@ -119,7 +119,7 @@ docker container run alpine ping 8.8.8.8
 docker container run -ti alpine ping 8.8.8.8
 ```
 
-4. La commande CTRL-P CTRL-Q permet de se détacher du speudo terminal (alloué avec les options -t -i, ou -ti).
+4. La commande CTRL-P CTRL-Q permet de se détacher du pseudo terminal (alloué avec les options -t -i, ou -ti).
 
 Le container continue à tourner. Il est listé avec la commande ```docker ps```
 

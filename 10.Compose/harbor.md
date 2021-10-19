@@ -158,6 +158,8 @@ Il est ensuite nécessaire de redémarrer le daemon Docker:
 $ sudo systemctl restart docker
 ```
 
+:fire: si vous avez lancé Harbor sur la même machine, assurez-vous de le redémarrer également si tous les services n'ont pas redémarré automatiquement. Utilisez pour cela la commande ```docker-compose up -d```.
+
 Vous devriez alors pouvoir vous logger sur le registry que vous avez mis en place.
 
 ```
@@ -182,7 +184,7 @@ $ docker image tag nginx:1.18 HOST_IP.nip.io/demo/www:1.0
 Vous pouvez ensuite envoyer l'image dans Harbor avec la commande suivante:
 
 ```
-$ docker image push HOST_IP.nip.io
+$ docker image push HOST_IP.nip.io/demo/www:1.0
 ```
 
 Vous obtiendrez un résultat proche de celui ci-dessous:
@@ -203,6 +205,22 @@ Cliquez sur ce dépot afin d'obtenir des informations supplémentaires sur cette
 ![Harbor](./images/harbor-6.png)
 
 Sélectionnez ensuite l'image et lancez un scanning de vulnérabilités en cliquant sur le bouton *Analyser*. Après quelques dizaines de secondes vous obtiendrez le résultat du scanning, notamment le nombre de failles détectées ainsi que leur niveau de criticité.
+
+:fire: si le scanning retourne une erreur, il peut être nécessaire de commenter l'option *dns_search* dans le fichier docker-compose.yaml généré lors de l'installation de Harbor puis de relancer l'application avec la commande ```docker-compose up -d```
+
+```
+  trivy-adapter:
+    container_name: trivy-adapter
+    image: goharbor/trivy-adapter-photon:v2.3.2
+    restart: always
+    cap_drop:
+      - ALL
+#    dns_search: .        <- ligne commentée
+    depends_on:
+      - log
+      - redis
+    ...
+```
 
 ![Harbor](./images/harbor-7.png)
 

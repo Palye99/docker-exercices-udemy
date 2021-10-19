@@ -8,13 +8,12 @@
 
 2. Dans le même répertoire, créez le fichier Dockerfile qui servira à construire l'image de l'application. Ce fichier devra décrire les actions suivantes
 
-- image de base: alpine:3.10
-- installation du runtime du langage choisi
+- spécification d'une image de base
+- installation du runtime correspondant au langage choisi
 - installation des dépendances de l’application
 - copie du code applicatif
 - exposition du port d’écoute de l’application
 - spécification de la commande à exécuter pour lancer le serveur
-
 
 3. Construire l’image en la taguant *pong:v1.0*
 
@@ -59,7 +58,7 @@ Le fichier *package.json* contient les dépendances de l'application (dans le ca
 2. Une version du Dockerfile pouvant être utilisé pour créer une image de l'application
 
 ```
-FROM node:12.13-alpine
+FROM node:16-alpine
 WORKDIR /app
 COPY . .
 RUN npm install
@@ -70,8 +69,8 @@ CMD ["npm", "start"]
 Note: il y a toujours plusieurs approches pour définir le fichier *Dockerfile* d'une application. On aurait par exemple pu partir d'une image de base comme *ubuntu* ou *alpine*, et installer le runtime *nodejs* comme dans l'exemple ci-dessous:
 
 ```
-FROM alpine:3.10
-RUN apk update && apk add nodejs-npm
+FROM alpine:3.14
+RUN apk add -u npm
 WORKDIR /app
 COPY . .
 RUN npm install
