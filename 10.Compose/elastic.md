@@ -25,7 +25,7 @@ Afin de définir notre stack ELK, créez un répertoire *elk* et, à l'intérieu
 version: '3.8'
 services:
   logstash:
-    image: logstash:7.8.0
+    image: logstash:7.14.2
     environment:
       discovery.seed_hosts: logstash
       LS_JAVA_OPTS: "-Xms512m -Xmx512m"
@@ -35,26 +35,24 @@ services:
     ports:
       - 8080:8080
   elasticsearch:
-    image: elasticsearch:7.8.0
+    image: elasticsearch:7.14.2
     environment:
       discovery.type: single-node
       ES_JAVA_OPTS: "-Xms512m -Xmx512m"
   kibana:
-    image: kibana:7.8.0
+    image: kibana:7.14.2
     ports:
       - 5601:5601
 ```
 
-Note:
-
-- Le service Logstash est basé sur l'image officielle logstash:7.8.0.
+Notes:
+- Le service Logstash est basé sur l'image officielle logstash:7.14.2.
 Nous précisons, sous la clé volumes, que le fichier de configuration logstash.conf présent dans le répertoire est monté sur /config/logstash.conf dans le container. Il sera pris en compte par Logstash au démarrage
-
-- Le service Kibana est basé sur l'image officielle kibana:7.8.0. Le mapping de port permettra à l'interface web d'être disponible sur le port 5601 de la machine hôte.
+- Le service Kibana est basé sur l'image officielle kibana:7.14.2. Le mapping de port permettra à l'interface web d'être disponible sur le port 5601 de la machine hôte.
 
 ## Fichier de configuration de Logstash
 
-Afin de pouvoir indexer des fichiers de logs existant, nous allons configurer Logstash. Dans le répertoire *elk* (ou se trouve le fichier docker-compose.yml), créez le fichier logstash.conf avec le contenu suivant
+Nous allons tout dabord définir un fichier de configuration pour Logstash. Dans le répertoire *elk* (ou se trouve le fichier docker-compose.yml), créez le fichier *logstash.conf* avec le contenu suivant
 
 ```
 input {
@@ -106,34 +104,30 @@ Ce fichier peu sembler un peu compliqué. Il peut être découpé en 3 parties:
 
 ## Lancement de la stack ELK
 
-Pre-réquis: avant de lancer la stack ELK, il est nécessaire de modifier un paramètre du noyau Linux pour assurer le bon fonctionnement de Elasticsearch, pour cela lancer la commande suivante:
-
-```
-$ sudo sysctl -w vm.max_map_count=262144
-```
-
 Vous pouvez ensuite lancer la stack avec la commande suivante
 
 ```
 $ docker-compose up -d
 ```
 
-Une fois les images téléchargées (depuis le Docker Hub), le lancement de l'application peut prendre quelques secondes.
+Une fois les images récupérées sur le Docker Hub, le lancement de l'application peut prendre quelques dizaines de secondes.
 
-L'interface web de Kibana est alors accessible sur le port 5601 de la machine hôte.
+L'interface web de Kibana est alors accessible sur le port 5601 de la machine hôte (localhost dans cet exemple).
+
+Cliquez sur le lien *Explore on my own* puis ensuite sur *Discover* dans la categorie *Analytics* du menu de gauche 
 
 ![ELK](./images/elk1.png)
 
-Cliquez sur l'option permettant de manipuler vos propres données
+![ELK](./images/elk-2.png)
 
-![ELK](./images/elk2.png)
+Suivez ensuite les instructions pour créer un *Index Pattern* qui permettra d'indexer les logs que vous enverez par la suite.
 
-Sur la page suivante, vous pourrez avoir un aperçu de toutes les fonctionnalités disponibles.
-Cliquez sur *Discover*.
+![ELK](./images/elk-3.png)
 
-![ELK](./images/elk3.png)
+![ELK](./images/elk-4.png)
 
-Cette page montre qu'il n'y a pas encore de données dans Elasticsearch, Kibana n'est pas en mesure de détecter un index.
+![ELK](./images/elk-5.png)
+
 
 ## Utilisation d'un fichier de logs de test
 
@@ -145,7 +139,9 @@ Nous utilisons pour cela l'image *mingrammer/flog* afin de générer des entrée
 $ docker run mingrammer/flog -f apache_combined > nginx.log
 ```
 
-La commande suivante permet d'envoyer chaque ligne à Logstash (assurez-vous d'avoir remplacé HOST par l'adresse IP de la machine sur laquelle la stack Elastic a été lancée)
+La commande suivante permet d'envoyer chaque ligne à Logstash:
+
+:fire: assurez-vous d'avoir remplacé HOST par l'adresse IP de la machine sur laquelle la stack Elastic a été lancée
 
 ```
 while read -r line; do curl -s -XPUT -d "$line" http://HOST:8080; done < ./nginx.log
@@ -153,17 +149,24 @@ while read -r line; do curl -s -XPUT -d "$line" http://HOST:8080; done < ./nginx
 
 :fire: vous devriez voir une succession de *ok* s'afficher, cela permet simplement de s'assurer que l'envoi des entrées de log s'est déroulée correctement
 
-Une fois le script terminé, cliquez sur le bouton permettant de rafraichir les données. Vous pourrez alors créer un index.
+Une fois le script terminé, retournez dans le menu *Discover*, vous pourrez alors voir les logs que vous avez envoyés précédemment.
 
-![ELK](./images/elk4.png)
-![ELK](./images/elk5.png)
+![ELK](./images/elk-6.png)
 
-Depuis le menu *Discover* vous pourrez alors voir les logs que vous avez envoyés précédemment.
+Kibana permet de faire des dashboards de visualisation et exploiter ainsi les informations contenues dans les logs. Les copies d'écran suivantes détaillent les étapes pour la création d'une première visualisation.
 
-![ELK](./images/elk6.png)
-![ELK](./images/elk7.png)
+![ELK](./images/elk-7.png)
+![ELK](./images/elk-8.png)
+![ELK](./images/elk-9.png)
+![ELK](./images/elk-10.png)
+![ELK](./images/elk-11.png)
 
+Manipulez ensuite l'interface pour créer vos propres visualisations et un dashboard pour grouper celles-ci.
 
-## En résumé
+## Cleanup
 
-Nous avons vu ici la facilité de déploiement de la stack Elastic à l'aide de Docker Compose. Je vous invite à naviguer dans l'interface de Kibana afin d'avoir une vue globale des nombreuses fonctionnalités qui sont disponibles.
+Vous pouvez ensuite supprimer cette stack à l'aide de la commande suivante:
+
+```
+$ docker-compose down -v
+```
